@@ -1,0 +1,20 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-console": "off",
+    "no-unused-vars": ["error", { "vars": "all", "args": "none" }],
+    "global-require": "error",
+    "no-new-require": "error",
+    "no-path-concat": "error",
+    "no-process-exit": "off",
+    "indent": [ "error", 2 ],
+    "linebreak-style": [ "error", "unix" ],
+    "quotes": [ "error", "single" ],
+    "semi": [ "error", "always" ]
+  }
+}

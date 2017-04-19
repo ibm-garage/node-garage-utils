@@ -1,0 +1,30 @@
+{
+  "name": "garage-utils",
+  "version": "1.0.0",
+  "description": "Common utilities for Express applications at the Bluemix Garage.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require test-config.js --reporter spec --ui bdd test/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.ibm.com/bluemix-garage/node-garage-utils.git"
+  },
+  "author": "Dave Steinberg <davidms@ca.ibm.com>",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=6.4.0",
+    "npm": ">=3.5.3"
+  },
+  "dependencies": {
+    "cfenv": "^1.0.4",
+    "moment": "^2.18.1",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.19.0",
+    "mocha": "^3.2.0"
+  }
+}
