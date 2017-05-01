@@ -13,11 +13,11 @@ Provides information about the running application. In most cases, you should ju
 not modify) `app.config`, though it can be useful occasionally to adjust them to simulate a
 different environment for testing purposes.
 
-##### app.config.rootDir
+#### app.config.rootDir
 
 The root directory of the application.
 
-##### app.config.env
+#### app.config.env
 
 The running environment of the application. One of:
 
