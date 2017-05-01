@@ -106,11 +106,11 @@ Returns the current time as an ISO 8601 date-time string with a 0 UTC offset (Z)
 
 ## Errors
 
-Creates errors that are easily translated into HTTP responses.
-
 ```
 const errors = require('garage-utils').errors;
 ```
+
+Creates errors that are easily translated into HTTP responses.
 
 #### errors.error(status, message, detail, cause)
 
@@ -155,11 +155,11 @@ causes.
 
 ## Logging
 
-Configures winston for running or testing an application.
-
 ```
 const logging = require('garage-utils').logging;
 ```
+
+Configures winston for running or testing an application.
 
 #### logging.formatter(options)
 
@@ -188,13 +188,13 @@ middleware to write to winston, using the specified log level (or 'verbose' by d
 
 ## Cloud Foundry
 
-Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse and interpret
-Cloud Foundry-provided environment variables, with better fallback handling for running locally
-and additional functions for querying service credentials.
-
 ```
 const cf = require('garage-utils').cf;
 ```
+
+Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse and interpret
+Cloud Foundry-provided environment variables, with better fallback handling for running locally
+and additional functions for querying service credentials.
 
 #### cf.getAppEnv()
 
