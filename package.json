@@ -1,7 +1,7 @@
 {
   "name": "garage-utils",
   "version": "1.0.0",
-  "description": "Common utilities for Express applications at the Bluemix Garage.",
+  "description": "Common utilities for Node/Express applications at the Bluemix Garage.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --require test-config.js --reporter spec --ui bdd test/**/*.js"

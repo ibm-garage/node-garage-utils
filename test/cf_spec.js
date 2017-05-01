@@ -30,7 +30,7 @@ describe('cf', () => {
   });
 
   afterEach(() => {
-    app.env.rootDir = app.rootDir();
+    app.config.rootDir = app.rootDir();
     cf._appEnv = undefined;
   });
 
@@ -47,14 +47,14 @@ describe('cf', () => {
 
     it('returns an app env with no services when services.json is not found', () => {
       // Adjust app root dir so that no services.json is found
-      app.env.rootDir = path.join(app.rootDir(), 'invalid');
+      app.config.rootDir = path.join(app.rootDir(), 'invalid');
       const appEnv = cf.getAppEnv();
       expect(appEnv.services).to.be.empty;
     });
 
     it('returns an app env with services when services.json is found', () => {
       // Adjust app root dir so that test mock services.json is found
-      app.env.rootDir = testDir;
+      app.config.rootDir = testDir;
       const appEnv = cf.getAppEnv();
       expect(appEnv.services.cloudantNoSQLDB).to.have.lengthOf(1);
       expect(appEnv.services['user-provided']).to.have.lengthOf(2);

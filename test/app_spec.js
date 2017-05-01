@@ -28,6 +28,13 @@ describe('app', () => {
       expect(app.rootDir()).to.equal(rootDir);
     });
 
+    it('returns the expected root when app tweaked to simulate installation under user_modules', () => {
+      const rootDir = path.sep + path.join('home', 'myapp');
+      const dir = path.join(rootDir, 'user_modules', 'lib');
+      app._dir = dir;
+      expect(app.rootDir()).to.equal(rootDir);
+    });
+
     it('throws when app is in an invalid location', () => {
       app._dir = path.join(app._dir, 'oops');
       expect(() => { app.rootDir(); }).to.throw(Error, /invalid location/);
