@@ -50,9 +50,9 @@ describe('app', () => {
       delete process.env.GAPP_ENV;
     });
 
-    it('returns \'spec\' if the GAPP_ENV environment variable is set to \'spec\'', () => {
-      process.env.GAPP_ENV = 'spec';
-      expect(app.env()).to.equal('spec');
+    it('returns \'unit\' if the GAPP_ENV environment variable is set to \'unit\'', () => {
+      process.env.GAPP_ENV = 'unit';
+      expect(app.env()).to.equal('unit');
     });
 
     it('returns \'dev\' if the GAPP_ENV environment variable is set to \'dev\'', () => {
@@ -71,8 +71,8 @@ describe('app', () => {
     });
 
     describe('when the GAPP_ENV environment variable is not set', () => {
-      it('returns \'spec\' in an unmodified unit testing environment, where mocha is the main module', () => {
-        expect(app.env()).to.equal('spec');
+      it('returns \'unit\' in an unmodified unit testing environment, where mocha is the main module', () => {
+        expect(app.env()).to.equal('unit');
       });
 
       describe('when the main module is tweaked to simulate a non-testing environment', () => {
@@ -121,13 +121,13 @@ describe('app', () => {
         app.config.env = app.env();
       });
 
-      describe('when env is \'spec\'', () => {
+      describe('when env is \'unit\'', () => {
         beforeEach(() => {
-          app.config.env = 'spec';
+          app.config.env = 'unit';
         });
 
-        it('isSpec() returns true', () => {
-          expect(app.config.isSpec()).to.be.true;
+        it('isUnit() returns true', () => {
+          expect(app.config.isUnit()).to.be.true;
         });
         it('isDev() returns false', () => {
           expect(app.config.isDev()).to.be.false;
@@ -147,8 +147,8 @@ describe('app', () => {
           app.config.env = 'dev';
         });
 
-        it('isSpec() returns false', () => {
-          expect(app.config.isSpec()).to.be.false;
+        it('isUnit() returns false', () => {
+          expect(app.config.isUnit()).to.be.false;
         });
         it('isDev() returns true', () => {
           expect(app.config.isDev()).to.be.true;
@@ -168,8 +168,8 @@ describe('app', () => {
           app.config.env = 'test';
         });
 
-        it('isSpec() returns false', () => {
-          expect(app.config.isSpec()).to.be.false;
+        it('isUnit() returns false', () => {
+          expect(app.config.isUnit()).to.be.false;
         });
         it('isDev() returns false', () => {
           expect(app.config.isDev()).to.be.false;
@@ -189,8 +189,8 @@ describe('app', () => {
           app.config.env = 'prod';
         });
 
-        it('isSpec() returns false', () => {
-          expect(app.config.isSpec()).to.be.false;
+        it('isUnit() returns false', () => {
+          expect(app.config.isUnit()).to.be.false;
         });
         it('isDev() returns false', () => {
           expect(app.config.isDev()).to.be.false;

@@ -21,7 +21,7 @@ The root directory of the application.
 
 The running environment of the application. One of:
 
-- 'spec' for unit testing
+- 'unit' for unit testing
 - 'dev' for development
 - 'test' for end-to-end testing and deployment to test environments
 - 'prod' for production deployment.
@@ -31,20 +31,20 @@ for the all the key environments. In particular, there's no accounting for a tes
 which should serve bundled client code but produce more verbose logging and error messages on the
 server.
 
-By default, the utility detects when running under Mocha and reports 'spec' in that case.
+By default, the utility detects when running under Mocha and reports 'unit' in that case.
 Otherwise, the value is either 'prod' or 'dev', depending on whether the NODE_ENV environment
 variable is 'production' or something else (or undefined). This aligns with the way Express
 interprets that environment variable.
 
-It is also possible to set a GAPP_ENV environment variable to one of 'spec', 'dev', 'test', or
+It is also possible to set a GAPP_ENV environment variable to one of 'unit', 'dev', 'test', or
 'prod' to override these defaults. Note that this is the only way to get a test environment.
 
 The following four functions are also provided to more easily test for a particular environment,
 avoiding the need for string comparisons.
 
-#### app.config.isSpec()
+#### app.config.isUnit()
 
-Returns true when `app.config` is 'spec', false otherwise.
+Returns true when `app.config` is 'unit', false otherwise.
 
 #### app.config.isDev()
 
