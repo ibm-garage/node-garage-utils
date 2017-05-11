@@ -37,6 +37,13 @@ describe('errors', () => {
     expect(error.cause).to.deep.equal(cause);
   });
 
+  it('unauthorized() returns a 401 \'Unauthorized\' error with specified cause', () => {
+    const error = errors.unauthorized(cause);
+    expect(error.message).to.equal('Unauthorized');
+    expect(error.status).to.equal(401);
+    expect(error.cause).to.deep.equal(cause);
+  });
+
   it('notFound() returns a 404 \'Not found\' error with specified cause', () => {
     const error = errors.notFound(cause);
     expect(error.message).to.equal('Not found');
