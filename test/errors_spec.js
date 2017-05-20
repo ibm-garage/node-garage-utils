@@ -125,5 +125,17 @@ describe('errors', () => {
       expect(e1CauseCount).to.equal(2);
       expect(e2CauseCount).to.equal(2);
     });
+
+    it('handles a non-error cause', () => {
+      const e1 = new Error('e1');
+      const e2 = new Error('e2');
+      const e3 = { errorCode: 101, message: 'Something went wrong' };
+      e1.cause = e2;
+      e2.cause = e3;
+      const stack = errors.stackWithCause(e1);
+      expect(stack.indexOf('Error: e1')).to.equal(0);
+      expect(stack.indexOf('Caused by Error: e2')).not.to.equal(-1);
+      expect(stack.indexOf('Caused by { errorCode: 101, message: \'Something went wrong\' }')).not.to.equal(-1);
+    });
   });
 });
