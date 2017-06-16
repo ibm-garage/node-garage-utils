@@ -62,7 +62,7 @@ The underlying functions that compute the initial `app.config` property values a
 Generally, they need only be used to reset the values on `app.config` after adjusting them for
 testing.
 
-#### app.rootDir
+#### app.rootDir()
 
 Returns the computed root directory that was used to initialized `app.config.rootDir`.
 
@@ -127,6 +127,10 @@ res.status(err.status).send(err.message);
 
 Creates a 400 Bad request error, with optional detail and cause.
 
+#### errors.unauthorized(cause)
+
+Creates a 401 Unauthorized error, with optional cause.
+
 #### errors.notFound(cause)
 
 Creates a 404 Not found error, with optional cause.
@@ -164,7 +168,7 @@ Configures winston for running or testing an application.
 #### logging.formatter(options)
 
 A formatter function for use with [winston](https://github.com/winstonjs/winston). Provides
-readable, consistent loggins across an application.
+readable, consistent logging across an application.
 
 #### logging.configureWinston(cfAppEnv)
 
