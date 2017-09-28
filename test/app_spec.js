@@ -37,7 +37,9 @@ describe('app', () => {
 
     it('throws when app is in an invalid location', () => {
       app._dir = path.join(app._dir, 'oops');
-      expect(() => { app.rootDir(); }).to.throw(Error, /invalid location/);
+      expect(() => {
+        app.rootDir();
+      }).to.throw(Error, /invalid location/);
     });
   });
 
@@ -50,28 +52,28 @@ describe('app', () => {
       delete process.env.GAPP_ENV;
     });
 
-    it('returns \'unit\' if the GAPP_ENV environment variable is set to \'unit\'', () => {
+    it("returns 'unit' if the GAPP_ENV environment variable is set to 'unit'", () => {
       process.env.GAPP_ENV = 'unit';
       expect(app.env()).to.equal('unit');
     });
 
-    it('returns \'dev\' if the GAPP_ENV environment variable is set to \'dev\'', () => {
+    it("returns 'dev' if the GAPP_ENV environment variable is set to 'dev'", () => {
       process.env.GAPP_ENV = 'dev';
       expect(app.env()).to.equal('dev');
     });
 
-    it('returns \'test\' if the GAPP_ENV environment variable is set to \'test\'', () => {
+    it("returns 'test' if the GAPP_ENV environment variable is set to 'test'", () => {
       process.env.GAPP_ENV = 'test';
       expect(app.env()).to.equal('test');
     });
 
-    it('returns \'prod\' if the GAPP_ENV environment variable is set to \'prod\'', () => {
+    it("returns 'prod' if the GAPP_ENV environment variable is set to 'prod'", () => {
       process.env.GAPP_ENV = 'prod';
       expect(app.env()).to.equal('prod');
     });
 
     describe('when the GAPP_ENV environment variable is not set', () => {
-      it('returns \'unit\' in an unmodified unit testing environment, where mocha is the main module', () => {
+      it("returns 'unit' in an unmodified unit testing environment, where mocha is the main module", () => {
         expect(app.env()).to.equal('unit');
       });
 
@@ -89,17 +91,17 @@ describe('app', () => {
           process.env.NODE_ENV = origNodeEnv;
         });
 
-        it('returns \'dev\' if the NODE_ENV environment variable is not set', () => {
+        it("returns 'dev' if the NODE_ENV environment variable is not set", () => {
           delete process.env.NODE_ENV;
           expect(app.env()).to.equal('dev');
         });
 
-        it('returns \'prod\' if NODE_ENV is set to \'production\'', () => {
+        it("returns 'prod' if NODE_ENV is set to 'production'", () => {
           process.env.NODE_ENV = 'production';
           expect(app.env()).to.equal('prod');
         });
 
-        it('returns \'dev\' if NODE_ENV is set to anything else', () => {
+        it("returns 'dev' if NODE_ENV is set to anything else", () => {
           process.env.NODE_ENV = 'prod';
           expect(app.env()).to.equal('dev');
         });
@@ -121,7 +123,7 @@ describe('app', () => {
         app.config.env = app.env();
       });
 
-      describe('when env is \'unit\'', () => {
+      describe("when env is 'unit'", () => {
         beforeEach(() => {
           app.config.env = 'unit';
         });
@@ -142,7 +144,7 @@ describe('app', () => {
         });
       });
 
-      describe('when env is \'dev\'', () => {
+      describe("when env is 'dev'", () => {
         beforeEach(() => {
           app.config.env = 'dev';
         });
@@ -163,7 +165,7 @@ describe('app', () => {
         });
       });
 
-      describe('when env is \'test\'', () => {
+      describe("when env is 'test'", () => {
         beforeEach(() => {
           app.config.env = 'test';
         });
@@ -184,7 +186,7 @@ describe('app', () => {
         });
       });
 
-      describe('when env is \'prod\'', () => {
+      describe("when env is 'prod'", () => {
         beforeEach(() => {
           app.config.env = 'prod';
         });

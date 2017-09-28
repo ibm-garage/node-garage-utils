@@ -105,7 +105,9 @@ describe('time', () => {
     });
 
     it('throws an exception for non-moment input', () => {
-      expect(() => { time.formatIsoUtc('now'); }).to.throw(TypeError);
+      expect(() => {
+        time.formatIsoUtc('now');
+      }).to.throw(TypeError);
     });
 
     it('correctly formats a UTC date-time', () => {

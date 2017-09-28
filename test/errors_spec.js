@@ -30,42 +30,42 @@ describe('errors', () => {
     });
   });
 
-  it('badRequest() returns a 400 \'Bad request\' error with specified detail and cause', () => {
+  it("badRequest() returns a 400 'Bad request' error with specified detail and cause", () => {
     const error = errors.badRequest('id not specified', cause);
     expect(error.message).to.equal('Bad request: id not specified');
     expect(error.status).to.equal(400);
     expect(error.cause).to.deep.equal(cause);
   });
 
-  it('unauthorized() returns a 401 \'Unauthorized\' error with specified cause', () => {
+  it("unauthorized() returns a 401 'Unauthorized' error with specified cause", () => {
     const error = errors.unauthorized(cause);
     expect(error.message).to.equal('Unauthorized');
     expect(error.status).to.equal(401);
     expect(error.cause).to.deep.equal(cause);
   });
 
-  it('notFound() returns a 404 \'Not found\' error with specified cause', () => {
+  it("notFound() returns a 404 'Not found' error with specified cause", () => {
     const error = errors.notFound(cause);
     expect(error.message).to.equal('Not found');
     expect(error.status).to.equal(404);
     expect(error.cause).to.deep.equal(cause);
   });
 
-  it('methodNotAllowed() returns a 405 \'Method not allowed\' error with specified cause', () => {
+  it("methodNotAllowed() returns a 405 'Method not allowed' error with specified cause", () => {
     const error = errors.methodNotAllowed(cause);
     expect(error.message).to.equal('Method not allowed');
     expect(error.status).to.equal(405);
     expect(error.cause).to.deep.equal(cause);
   });
 
-  it('conflict() returns a 409 \'Conflict\' error with specified detail and cause', () => {
+  it("conflict() returns a 409 'Conflict' error with specified detail and cause", () => {
     const error = errors.conflict('already exists', cause);
     expect(error.message).to.equal('Conflict: already exists');
     expect(error.status).to.equal(409);
     expect(error.cause).to.deep.equal(cause);
   });
 
-  it('internalServerError() returns a 500 \'Internal server error\' error with specified cause', () => {
+  it("internalServerError() returns a 500 'Internal server error' error with specified cause", () => {
     const error = errors.internalServerError(cause);
     expect(error.message).to.equal('Internal server error');
     expect(error.status).to.equal(500);
@@ -135,7 +135,9 @@ describe('errors', () => {
       const stack = errors.stackWithCause(e1);
       expect(stack.indexOf('Error: e1')).to.equal(0);
       expect(stack.indexOf('Caused by Error: e2')).not.to.equal(-1);
-      expect(stack.indexOf('Caused by { errorCode: 101, message: \'Something went wrong\' }')).not.to.equal(-1);
+      expect(
+        stack.indexOf("Caused by { errorCode: 101, message: 'Something went wrong' }")
+      ).not.to.equal(-1);
     });
   });
 });

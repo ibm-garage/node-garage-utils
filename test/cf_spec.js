@@ -102,12 +102,16 @@ describe('cf', () => {
       });
 
       it('throws an error for a service label', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByLabel('cloudantNoSQLDB'); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByLabel('cloudantNoSQLDB');
+        };
         expect(fn).to.throw(/Service not found/);
       });
 
       it('throws an error for a service label regexp', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByLabel(/NoSQL/); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByLabel(/NoSQL/);
+        };
         expect(fn).to.throw(/Service not found/);
       });
     });
@@ -134,22 +138,30 @@ describe('cf', () => {
       });
 
       it('throws an error for a non-existent service label', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByLabel('badService'); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByLabel('badService');
+        };
         expect(fn).to.throw(/Service not found/);
       });
 
       it('throws an error for a regexp that does not match a service label', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByLabel(/badService/); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByLabel(/badService/);
+        };
         expect(fn).to.throw(/Service not found/);
       });
 
       it('throws an error for a service label with multiple instances', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByLabel('user-provided'); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByLabel('user-provided');
+        };
         expect(fn).to.throw(/Multiple instances of service found/);
       });
 
       it('throws an error for a regexp that matches a service label with multiple instances', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByLabel(/user/); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByLabel(/user/);
+        };
         expect(fn).to.throw(/Multiple instances of service found/);
       });
     });
@@ -168,12 +180,16 @@ describe('cf', () => {
       });
 
       it('throws an error for a service name', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByName('test-cloudantNoSQLDB'); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByName('test-cloudantNoSQLDB');
+        };
         expect(fn).to.throw(/Service not found/);
       });
 
       it('throws an error for a service name regexp', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByName(/NoSQL/); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByName(/NoSQL/);
+        };
         expect(fn).to.throw(/Service not found/);
       });
     });
@@ -200,7 +216,9 @@ describe('cf', () => {
       });
 
       it('throws an error for a non-existent service name', () => {
-        const fn = () => { cf.getAppEnv().getServiceCredsByName('badService'); };
+        const fn = () => {
+          cf.getAppEnv().getServiceCredsByName('badService');
+        };
         expect(fn).to.throw(/Service not found/);
       });
 

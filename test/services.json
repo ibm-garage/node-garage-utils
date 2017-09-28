@@ -11,11 +11,7 @@
       "label": "cloudantNoSQLDB",
       "name": "test-cloudantNoSQLDB",
       "plan": "Shared",
-      "tags": [
-        "data_management",
-        "ibm_created",
-        "ibm_dedicated_public"
-      ]
+      "tags": ["data_management", "ibm_created", "ibm_dedicated_public"]
     }
   ],
   "user-provided": [
