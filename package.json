@@ -12,7 +12,8 @@
   "main": "index.js",
   "scripts": {
     "test": "npm-run-all lint test:unit",
-    "test:unit": "mocha --require test-config.js --reporter spec --ui bdd test/**/*.js",
+    "test:unit": "mocha test/**/*.js",
+    "test:unit:watch": "mocha --watch test/**/*.js",
     "lint": "eslint index.js lib test",
     "format": "prettier --write '*.@(js|json)' '@(lib|test)/**/*.@(js|json)'"
   },
