@@ -52,24 +52,9 @@ describe('app', () => {
       delete process.env.GAPP_ENV;
     });
 
-    it("returns 'unit' if the GAPP_ENV environment variable is set to 'unit'", () => {
-      process.env.GAPP_ENV = 'unit';
-      expect(app.env()).to.equal('unit');
-    });
-
-    it("returns 'dev' if the GAPP_ENV environment variable is set to 'dev'", () => {
-      process.env.GAPP_ENV = 'dev';
-      expect(app.env()).to.equal('dev');
-    });
-
-    it("returns 'test' if the GAPP_ENV environment variable is set to 'test'", () => {
-      process.env.GAPP_ENV = 'test';
-      expect(app.env()).to.equal('test');
-    });
-
-    it("returns 'prod' if the GAPP_ENV environment variable is set to 'prod'", () => {
-      process.env.GAPP_ENV = 'prod';
-      expect(app.env()).to.equal('prod');
+    it('returns the value of the GAPP_ENV environment variable if set', () => {
+      process.env.GAPP_ENV = 'custom';
+      expect(app.env()).to.equal('custom');
     });
 
     describe('when the GAPP_ENV environment variable is not set', () => {
@@ -116,6 +101,27 @@ describe('app', () => {
 
     it('has the default env value', () => {
       expect(app.config.env).to.equal(app.env());
+    });
+
+    describe('isSpec()', () => {
+      let origMainFilename;
+
+      beforeEach(() => {
+        origMainFilename = require.main.filename;
+      });
+
+      afterEach(() => {
+        require.main.filename = origMainFilename;
+      });
+
+      it('returns true in an unmodified unit testing environment, where mocha is the main module', () => {
+        expect(app.config.isSpec()).to.be.true;
+      });
+
+      it('returns false when the main module is tweaked to simulate a non-testing environment', () => {
+        require.main.filename = path.join(app.rootDir(), 'app.js');
+        expect(app.config.isSpec()).to.be.false;
+      });
     });
 
     describe('the boolean env functions...', () => {
@@ -204,6 +210,27 @@ describe('app', () => {
 
         it('isProd() returns true', () => {
           expect(app.config.isProd()).to.be.true;
+        });
+      });
+
+      describe("when env is 'custom'", () => {
+        beforeEach(() => {
+          app.config.env = 'custom';
+        });
+
+        it('isUnit() returns false', () => {
+          expect(app.config.isUnit()).to.be.false;
+        });
+        it('isDev() returns false', () => {
+          expect(app.config.isDev()).to.be.false;
+        });
+
+        it('isTest() returns false', () => {
+          expect(app.config.isTest()).to.be.false;
+        });
+
+        it('isProd() returns false', () => {
+          expect(app.config.isProd()).to.be.false;
         });
       });
     });

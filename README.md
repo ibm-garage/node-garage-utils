@@ -10,34 +10,40 @@ const app = require('garage-utils').app;
 ```
 
 Provides information about the running application. In most cases, you should just read from (and
-not modify) `app.config`, though it can be useful occasionally to adjust them to simulate a
+not modify) `app.config`, though it can be useful occasionally to adjust it to simulate a
 different environment for testing purposes.
 
 #### app.config.rootDir
 
 The root directory of the application.
 
+#### app.config.isSpec()
+
+Returns true when Mocha specs are running, false otherwise.
+
 #### app.config.env
 
-The running environment of the application. One of:
+The running environment of the application. This can be one of the following four built-in values,
+or any desired custom value:
 
 - 'unit' for unit testing
 - 'dev' for development
-- 'test' for end-to-end testing and deployment to test environments
+- 'test' for integration testing and deployment to test environments
 - 'prod' for production deployment.
 
-Though the NODE_ENV environment variable is a handy mechanism, it's not sufficient due to account
-for the all the key environments. In particular, there's no accounting for a test environment,
-which should serve bundled client code but produce more verbose logging and error messages on the
-server.
+Though the NODE_ENV environment variable is a handy mechanism, it's not sufficient to account for
+all the key environments. In particular, there's no accounting for a test environment, which should
+serve bundled client code but produce more verbose logging and error messages on the server.
 
-By default, the utility detects when running under Mocha and reports 'unit' in that case.
-Otherwise, the value is either 'prod' or 'dev', depending on whether the NODE_ENV environment
-variable is 'production' or something else (or undefined). This aligns with the way Express
-interprets that environment variable.
+By default, the utility detects when running under Mocha (i.e. when `app.config.isSpec()` returns
+true) and reports 'unit' in that case. Otherwise, the value is either 'prod' or 'dev', depending on
+whether the NODE_ENV environment variable is 'production' or something else (or undefined). This
+aligns with the way Express interprets that environment variable.
 
 It is also possible to set a GAPP_ENV environment variable to one of 'unit', 'dev', 'test', or
-'prod' to override these defaults. Note that this is the only way to get a test environment.
+'prod', or to any custom value, to override these defaults. Note that setting GAPP_ENV is the only
+way to get a test environment. You should definitely do this when using Mocha to run integration
+tests; otherwise, they will be mistaken for unit tests.
 
 The following four functions are also provided to more easily test for a particular environment,
 avoiding the need for string comparisons.
@@ -64,7 +70,7 @@ testing.
 
 #### app.rootDir()
 
-Returns the computed root directory that was used to initialized `app.config.rootDir`.
+Returns the computed root directory that was used to initialize `app.config.rootDir`.
 
 #### app.env()
 
