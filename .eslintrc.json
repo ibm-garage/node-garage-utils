@@ -4,6 +4,7 @@
     "node": true,
     "es6": true
   },
+  "plugins": ["prettier"],
   "extends": "eslint:recommended",
   "rules": {
     "no-console": "off",
@@ -11,10 +12,11 @@
     "global-require": "error",
     "no-new-require": "error",
     "no-path-concat": "error",
+    "no-var": "error",
     "no-process-exit": "off",
-    "indent": [ "error", 2 ],
-    "linebreak-style": [ "error", "unix" ],
-    "quotes": [ "error", "single" ],
-    "semi": [ "error", "always" ]
+    "linebreak-style": ["error", "unix"],
+    "no-extra-semi": "off",
+    "no-mixed-spaces-and-tabs": "off",
+    "prettier/prettier": "error"
   }
 }
