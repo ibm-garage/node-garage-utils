@@ -26,10 +26,10 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^3.19.0",
+    "chai": "^4.1.2",
+    "eslint": "^4.8.0",
     "eslint-plugin-prettier": "^2.3.1",
-    "mocha": "^3.2.0",
+    "mocha": "^3.5.3",
     "npm-run-all": "^4.1.1",
     "prettier": "^1.7.2"
   }
