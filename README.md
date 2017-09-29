@@ -3,7 +3,9 @@
 This module provides a number of common utilities for Node/Express applications at the Bluemix
 Garage.
 
-## Application
+## Utilities
+
+### Application
 
 ```
 const app = require('garage-utils').app;
@@ -77,7 +79,7 @@ Returns the computed root directory that was used to initialize `app.config.root
 Returns the computed environment that was used to initialize `app.config.env`.
 
 
-## Time
+### Time
 
 ```
 const time = require('garage-utils').time;
@@ -110,7 +112,7 @@ Converts a moment to an ISO 8601 date-time string with a 0 UTC offset (Z).
 Returns the current time as an ISO 8601 date-time string with a 0 UTC offset (Z).
 
 
-## Errors
+### Errors
 
 ```
 const errors = require('garage-utils').errors;
@@ -163,7 +165,7 @@ Returns a string combining the stack traces for the given error and up to 4 leve
 causes.
 
 
-## Logging
+### Logging
 
 ```
 const logging = require('garage-utils').logging;
@@ -196,7 +198,7 @@ Returns a stream that can be used with [morgan](https://github.com/expressjs/mor
 middleware to write to winston, using the specified log level (or 'verbose' by default).
 
 
-## Cloud Foundry
+### Cloud Foundry
 
 ```
 const cf = require('garage-utils').cf;
@@ -249,3 +251,7 @@ const appEnv = cf.getAppEnv();
 // Do some testing...
 unmock();
 ```
+
+## License
+
+This module is licensed under the MIT License. The full text is available in [LICENSE](LICENSE).
