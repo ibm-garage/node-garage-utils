@@ -212,9 +212,8 @@ and additional functions for querying service credentials.
 
 Returns the core bits of Clound Foundry data, as detailed the cfenv docs. This is a singleton.
 
-This function looks for a file named `services.json` in the root directory of the application and,
-if it exists, uses it to populate the services, instead of the `VCAP_SERVICES` environment
-variable.
+If the `VCAP_SERVICES` environment variable is not defined, this function looks for a file named `services.json` in the root directory of the application and, if it exists, uses it to populate the
+services, instead.
 
 Copying the contents of `VCAP_SERVICES` from a configured Cloud Foundry application into a
 `services.json` file allows for running the application locally. **Note:** Such a file should
@@ -236,21 +235,6 @@ label, the instance of the first service will be returned.
 
 Returns the credentials object of a service by name (i.e. by instance name). This works just like
 `appEnv.getServiceCreds(spec)`, except it throws an exception if no service is found.
-
-#### cf.mock(servicesFile)
-
-Resets the value returned by `cf.getAppEnv()` using service data read from the specified file,
-instead of `services.json`. Useful for testing with mock service credentials.
-
-This function returns an unmock() function that resets the value returned by `cf.getAppEnv()` back
-to the default.
-
-```
-const unmock = cf.mock(path.join(app.config.rootDir, 'test', 'mockServices.json'));
-const appEnv = cf.getAppEnv();
-// Do some testing...
-unmock();
-```
 
 ## License
 

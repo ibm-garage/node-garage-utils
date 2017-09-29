@@ -8,9 +8,6 @@ const utils = require('../index');
 const app = utils.app;
 const cf = utils.cf;
 
-const testDir = path.join(app.rootDir(), 'test');
-const servicesFile = path.join(testDir, 'services.json');
-
 const cloudantCreds = {
   host: 'host-bluemix.cloudant.com',
   password: 'passw0rd',
@@ -24,14 +21,26 @@ const userProvidedCreds = {
   url: 'https://service1.com/api/v1'
 };
 
+const vcapServices =
+  '{"discovery":[{"credentials":{"password":"passw0rd","url":"https://gateway.watsonplatform.net/discovery/api","username":"user"},"label":"discovery","name":"cyberguardian-discovery","plan":"lite","provider":null,"syslog_drain_url":null}]}';
+
+const rootDir = app.rootDir();
+const testDir = path.join(rootDir, 'test');
+
+function mockServicesFile(mock) {
+  // Adjust app root dir so that test mock services.json is found
+  app.config.rootDir = mock ? testDir : rootDir;
+}
+
 describe('cf', () => {
   beforeEach(() => {
     cf._appEnv = undefined;
   });
 
   afterEach(() => {
-    app.config.rootDir = app.rootDir();
+    mockServicesFile(false);
     cf._appEnv = undefined;
+    delete process.env.VCAP_SERVICES;
   });
 
   describe('getAppEnv()', () => {
@@ -45,62 +54,36 @@ describe('cf', () => {
       expect(appEnv.getServiceCredsByName).to.be.a('function');
     });
 
-    it('returns an app env with no services when services.json is not found', () => {
-      // Adjust app root dir so that no services.json is found
-      app.config.rootDir = path.join(app.rootDir(), 'invalid');
+    it('uses VCAP_SERVICES environment variable to populate app env services if set', () => {
+      process.env.VCAP_SERVICES = vcapServices;
       const appEnv = cf.getAppEnv();
-      expect(appEnv.services).to.be.empty;
+      expect(appEnv.services.discovery).to.have.lengthOf(1);
     });
 
-    it('returns an app env with services when services.json is found', () => {
-      // Adjust app root dir so that test mock services.json is found
-      app.config.rootDir = testDir;
-      const appEnv = cf.getAppEnv();
-      expect(appEnv.services.cloudantNoSQLDB).to.have.lengthOf(1);
-      expect(appEnv.services['user-provided']).to.have.lengthOf(2);
-    });
-  });
-
-  describe('mock()', () => {
-    afterEach(() => {
-      cf._appEnv = undefined;
-    });
-
-    it('with no services file, mocks the app env to contain no services', () => {
-      cf.mock();
-      const appEnv = cf.getAppEnv();
-      expect(appEnv.services).to.be.empty;
-    });
-
-    it('with a services file, mocks the app env to contain the services therein', () => {
-      cf.mock(servicesFile);
+    it('uses services.json file to populate app env services if found', () => {
+      mockServicesFile(true);
       const appEnv = cf.getAppEnv();
       expect(appEnv.services.cloudantNoSQLDB).to.have.lengthOf(1);
       expect(appEnv.services['user-provided']).to.have.lengthOf(2);
     });
 
-    it('returns an unmock() function that resets the app env so that a default one is constructed next time', () => {
-      const unmock = cf.mock(servicesFile);
-      let appEnv = cf.getAppEnv();
-      expect(appEnv.services).to.not.be.empty;
-      unmock();
-      appEnv = cf.getAppEnv();
+    it('uses VCAP_SERVICES and ignores services.json if both are found', () => {
+      mockServicesFile(true);
+      process.env.VCAP_SERVICES = vcapServices;
+      const appEnv = cf.getAppEnv();
+      expect(appEnv.services.discovery).to.have.lengthOf(1);
+      expect(appEnv.services.cloudantNoSQLDB).to.be.undefined;
+      expect(appEnv.services['user-provided']).to.be.undefined;
+    });
+
+    it('returns an app env with no services when neither VCAP_SERVICES nor services.json is not found', () => {
+      const appEnv = cf.getAppEnv();
       expect(appEnv.services).to.be.empty;
     });
   });
 
   describe('getServiceCredsByLabel()', () => {
     describe('when the app env has no services', () => {
-      let unmock;
-
-      beforeEach(() => {
-        unmock = cf.mock();
-      });
-
-      afterEach(() => {
-        unmock();
-      });
-
       it('throws an error for a service label', () => {
         const fn = () => {
           cf.getAppEnv().getServiceCredsByLabel('cloudantNoSQLDB');
@@ -117,14 +100,12 @@ describe('cf', () => {
     });
 
     describe('when the app env has services', () => {
-      let unmock;
-
       beforeEach(() => {
-        unmock = cf.mock(servicesFile);
+        mockServicesFile(true);
       });
 
       afterEach(() => {
-        unmock();
+        mockServicesFile(false);
       });
 
       it('returns credentials for a service label', () => {
@@ -169,16 +150,6 @@ describe('cf', () => {
 
   describe('getServiceCredsByName()', () => {
     describe('when the app env has no services', () => {
-      let unmock;
-
-      beforeEach(() => {
-        unmock = cf.mock();
-      });
-
-      afterEach(() => {
-        unmock();
-      });
-
       it('throws an error for a service name', () => {
         const fn = () => {
           cf.getAppEnv().getServiceCredsByName('test-cloudantNoSQLDB');
@@ -195,14 +166,12 @@ describe('cf', () => {
     });
 
     describe('when the app env has services', () => {
-      let unmock;
-
       beforeEach(() => {
-        unmock = cf.mock(servicesFile);
+        mockServicesFile(true);
       });
 
       afterEach(() => {
-        unmock();
+        mockServicesFile(false);
       });
 
       it('returns credentials for a service name', () => {
