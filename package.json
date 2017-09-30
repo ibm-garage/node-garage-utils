@@ -20,6 +20,7 @@
     "node": ">=6.4.0",
     "npm": ">=3.5.3"
   },
+  "files": ["LICENSE", "README.md", "index.js", "lib/"],
   "dependencies": {
     "cfenv": "^1.0.4",
     "moment": "^2.18.1",

@@ -3,12 +3,21 @@
 This module provides a number of common utilities for Node/Express applications at the Bluemix
 Garage.
 
-## Utilities
+## Installation
+
+```
+npm install garage-utils
+```
+
+**Note:** Older versions of npm (before 5.0) do not save installed packages by default, so you will
+probably want to add the `--save` option there.
+
+## APIs
 
 ### Application
 
 ```
-const app = require('garage-utils').app;
+const { app } = require('garage-utils');
 ```
 
 Provides information about the running application. In most cases, you should just read from (and
@@ -82,7 +91,7 @@ Returns the computed environment that was used to initialize `app.config.env`.
 ### Time
 
 ```
-const time = require('garage-utils').time;
+const { time } = require('garage-utils');
 ```
 
 Higher-level time handling functions based on [Moment.js](https://momentjs.com/).
@@ -115,7 +124,7 @@ Returns the current time as an ISO 8601 date-time string with a 0 UTC offset (Z)
 ### Errors
 
 ```
-const errors = require('garage-utils').errors;
+const { errors } = require('garage-utils');
 ```
 
 Creates errors that are easily translated into HTTP responses.
@@ -168,7 +177,7 @@ causes.
 ### Logging
 
 ```
-const logging = require('garage-utils').logging;
+const { logging } = require('garage-utils');
 ```
 
 Configures winston for running or testing an application.
@@ -201,7 +210,7 @@ middleware to write to winston, using the specified log level (or 'verbose' by d
 ### Cloud Foundry
 
 ```
-const cf = require('garage-utils').cf;
+const { cf } = require('garage-utils');
 ```
 
 Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse and interpret
