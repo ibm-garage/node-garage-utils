@@ -3,14 +3,14 @@ node_js:
   - node
   - "6.4.0"
 after_script: cat coverage/lcov.info | node_modules/.bin/coveralls
-
 jobs:
   include:
-    - stage: release
-      if: type = push AND branch = master AND tag =~ ^v
+    - if: tag =~ ^v
+      stage: release
       install: skip
       script: skip
       deploy:
         provider: npm
         email: davidms@ca.ibm.com
         api_key: $NPM_TOKEN
+      after_script: skip
