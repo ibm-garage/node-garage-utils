@@ -1,3 +1,6 @@
+[![Build Status](https://img.shields.io/travis/ibm-garage/node-garage-utils/master.svg)](https://travis-ci.org/ibm-garage/node-garage-utils)
+[![Coverage Status](https://img.shields.io/coveralls/ibm-garage/node-garage-utils.svg)](https://coveralls.io/github/ibm-garage/node-garage-utils?branch=master)
+
 # Garage Utilities for Node
 
 This module provides a number of common utilities for Node/Express applications at the Bluemix
