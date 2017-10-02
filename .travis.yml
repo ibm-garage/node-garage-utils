@@ -1,5 +1,16 @@
 language: node_js
 node_js:
-  - "6.4.0"
   - node
+  - "6.4.0"
 after_script: cat coverage/lcov.info | node_modules/.bin/coveralls
+
+jobs:
+  include:
+    - stage: release
+      if: type = push AND branch = master AND tag =~ ^v
+      install: skip
+      script: skip
+      deploy:
+        provider: npm
+        email: davidms@ca.ibm.com
+        api_key: $NPM_TOKEN
