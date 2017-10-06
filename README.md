@@ -177,37 +177,93 @@ Returns a string combining the stack traces for the given error and up to 4 leve
 causes.
 
 
-### Logging
+### Logger
 
 ```
-const { logging } = require('garage-utils');
+const { logger } = require('garage-utils');
 ```
 
-Configures winston for running or testing an application.
+Logging support based on [log4js](https://github.com/nomiddlename/log4js-node) that is
+automatically preconfigured for development, production, and testing environments.
 
-#### logging.formatter(options)
+#### Levels
 
-A formatter function for use with [winston](https://github.com/winstonjs/winston). Provides
-readable, consistent logging across an application.
+| Level | Description |
+| - | - |
+| trace | The lowest-level messages that help you follow execution flow. |
+| debug | Detailed messages for isolating problems in the code. |
+| info | Occasional messages reporting task completion and status. |
+| warn | Warning messages identifying when something goes wrong that doesn't result in an error. |
+| error | Error messages for failures that prevent a request or an action from completing. |
+| fatal | Fatal errors that result in the application being terminated. |
 
-#### logging.configureWinston(cfAppEnv)
+By default, applications in production log to stdout at level 'info' and above. Applications
+running in other environments log to stdout at level 'debug' and above.
 
-Configures Winston for running an application. Log messages are formatted by `logging.formatter`
-and sent to the console. The specified Cloud Foundry environment (see `cf.getAppEnv()`) is
-used to determine whether to include a timestamp (when running locally) or not (when running on
-Cloud Foundry).
+Automated tests (specs) log all levels to a `test.log` file, plus levels 'warn' and above to
+stderr. This prevents expected log output from messing up the test reports.
 
-#### logging.configureWinstonForTests([suppressConsoleWarn], [filename])
+#### logger.log(level, ...args)
 
-Configures Winston for running tests. Log messages are formatted by `logging.formatter` and
-sent to the specified file (or `test.log` by default). Only warnings and errors are sent to
-the console, so as to avoid obscurring test reports with expected log output. When testing
-error conditions, you can also suppress those warnings and errors.
+Logs a message at the specified level.
 
-#### logging.morganToWinstonStream([level])
+The level may be one of 'trace', 'debug', 'info', 'warn', 'error', or 'fatal'. The message is
+formed by passing the remaining arguments to
+[`util.format()`](https://nodejs.org/api/util.html#util_util_format_format_args). So, you can pass
+a single message, provide several objects to be inspected and concatenated, or do % placeholder
+replacement. Errors are handled properly, too, logging the trace and additional data.
 
-Returns a stream that can be used with [morgan](https://github.com/expressjs/morgan) logging
-middleware to write to winston, using the specified log level (or 'verbose' by default).
+#### logger.trace(...args)
+
+Logs a message at level 'trace'.
+
+#### logger.debug(...args)
+
+Logs a message at level 'debug'.
+
+#### logger.info(...args)
+
+Logs a message at level 'info'.
+
+#### logger.warn(...args)
+
+Logs a message at level 'warn'.
+
+#### logger.error(...args)
+
+Logs a message at level 'error'.
+
+#### logger.fatal(...args)
+
+Logs a message at level 'fatal'.
+
+#### logger.setLevel([level])
+
+Sets the minimium level to log. This should normally be called immediately upon starting an
+application; however, it is safe to change the level at any point, as the application runs.
+
+The level may be one of 'all', 'trace', 'debug', 'info', 'warn', 'error', 'fatal', or 'off'. Note
+that 'all' and 'trace' currently have the same effect. The only difference is that, if you specifiy
+'all', any new, lower levels that might be added in the future would be included automatically.
+
+If a level is not specified, logging resets to the default level for the environment.
+
+#### logger.suppressSpecErr(suppress)
+
+In a spec definition, suppresses or reenables logging to stderr (at level 'warning' and above),
+according to whether or not suppress is truthy. This can be used to prevent expected warnings,
+errors, and fatal errors from messing up test reports. **Note: Do not use in application code.**
+
+#### logger.connectFormatter(options)
+
+Returns a Connect/Express middleware function that logs requests and responses via the logger.
+
+The recognized options are `level` (the level at which to log), `format` (the Connect logger
+format), and `nolog` (an expression specifying which requests not to log). These options are more
+fully described in the
+[log4js documentation](https://nomiddlename.github.io/log4js-node/connect-logger.html). There are
+reasonable default values for level ('debug') and format, so normally you won't need to provide
+any options.
 
 
 ### Cloud Foundry

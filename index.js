@@ -6,6 +6,6 @@ module.exports = {
   app: require('./lib/app'),
   time: require('./lib/time'),
   errors: require('./lib/errors'),
-  logging: require('./lib/logging'),
+  logger: require('./lib/logger'),
   cf: require('./lib/cf')
 };
