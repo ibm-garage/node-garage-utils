@@ -13,5 +13,6 @@ jobs:
         provider: npm
         email: davidms@ca.ibm.com
         api_key: $NPM_TOKEN
-        all_branches: true
+        on:
+          all_branches: true
       after_script: skip
