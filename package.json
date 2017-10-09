@@ -1,7 +1,7 @@
 {
   "name": "garage-utils",
   "version": "2.0.0",
-  "description": "Common utilities for Node/Express applications at the Bluemix Garage.",
+  "description": "Common utilities for Node/Express applications at the IBM Cloud Garage.",
   "repository": {
     "type": "git",
     "url": "https://github.com/ibm-garage/node-garage-utils.git"
@@ -22,10 +22,7 @@
     "node": ">=6.4.0",
     "npm": ">=3.5.3"
   },
-  "files": [
-    "index.js",
-    "lib/"
-  ],
+  "files": ["index.js", "lib/"],
   "dependencies": {
     "cfenv": "^1.0.4",
     "log4js": "^2.3.4",
