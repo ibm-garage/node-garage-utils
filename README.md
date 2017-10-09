@@ -186,7 +186,11 @@ const { logger } = require('garage-utils');
 ```
 
 Logging support based on [log4js](https://github.com/nomiddlename/log4js-node) that is
-automatically preconfigured for development, production, and testing environments.
+automatically preconfigured for for various different environments, including testing, scripting,
+and runtime (locally and on Cloud Foundry, in development and production).
+
+You can use the logging functions defined here for all error and progress reporting, and it will
+be handled appropriately for the context in which the code runs.
 
 #### Levels
 
@@ -204,6 +208,35 @@ running in other environments log to stdout at level 'debug' and above.
 
 Automated tests (specs) log all levels to a `test.log` file, plus levels 'warn' and above to
 stderr. This prevents expected log output from messing up the test reports.
+
+Scripts log to stderr at level 'warn' and above by default.
+
+In all cases, the logging level can be set dynamically by the application.
+
+#### logger.configure([options])
+
+Configures the logger. Normally, this does not need to be called, as the logger will correctly
+configure itself for a conventional Garage application. However, you may call this function once,
+*before logging anything*, to specify non-default logger options. Currently, two properties are
+supported in the options object:
+
+- **type**: the type of environment, one of 'localApp', 'cfApp', 'app' (to automatically select
+  between local or CF), 'spec', or 'script'
+- **name**: for type 'script' only, the name of the script or command to be shown at the beginning
+  of each message (if not specified, the basename of `appEnv.mainFile` is used by default).
+
+If called after the logger has already been configured or used, this function does nothing.
+
+#### logger.setLevel([level])
+
+Sets the minimium level to log. This should normally be called immediately upon starting an
+application; however, it is safe to change the level at any point, as the application runs.
+
+The level may be one of 'all', 'trace', 'debug', 'info', 'warn', 'error', 'fatal', or 'off'. Note
+that 'all' and 'trace' currently have the same effect. The only difference is that, if you specifiy
+'all', any new, lower levels that might be added in the future would be included automatically.
+
+If a level is not specified, logging resets to the default level for the environment.
 
 #### logger.log(level, ...args)
 
@@ -238,17 +271,6 @@ Logs a message at level 'error'.
 #### logger.fatal(...args)
 
 Logs a message at level 'fatal'.
-
-#### logger.setLevel([level])
-
-Sets the minimium level to log. This should normally be called immediately upon starting an
-application; however, it is safe to change the level at any point, as the application runs.
-
-The level may be one of 'all', 'trace', 'debug', 'info', 'warn', 'error', 'fatal', or 'off'. Note
-that 'all' and 'trace' currently have the same effect. The only difference is that, if you specifiy
-'all', any new, lower levels that might be added in the future would be included automatically.
-
-If a level is not specified, logging resets to the default level for the environment.
 
 #### logger.suppressSpecErr(suppress)
 

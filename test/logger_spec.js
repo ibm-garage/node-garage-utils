@@ -32,14 +32,31 @@ describe('logger', () => {
     }
 
     describe('when a configuration type is explicitly specified', () => {
-      it('uses the correct configuration for app', () => {
+      it('uses the correct configuration for localApp', () => {
         logger.configure({ type: 'app' });
-        expect(getAppenders()).to.deep.equal(['appOut']);
+        expect(getAppenders()).to.deep.equal(['localAppOut']);
       });
 
       it('uses the correct configuration for cfApp', () => {
         logger.configure({ type: 'cfApp' });
         expect(getAppenders()).to.deep.equal(['cfAppOut']);
+      });
+
+      describe('selects the correct configuration for app', () => {
+        afterEach(() => {
+          delete process.env.VCAP_APPLICATION;
+        });
+
+        it('uses the localApp configuration in a non-CF environment', () => {
+          logger.configure({ type: 'cfApp' });
+          expect(getAppenders()).to.deep.equal(['cfAppOut']);
+        });
+
+        it('uses the cfApp configuration in a CF environment', () => {
+          process.env.VCAP_APPLICATION = '{}';
+          logger.configure({ type: 'cfApp' });
+          expect(getAppenders()).to.deep.equal(['cfAppOut']);
+        });
       });
 
       it('uses the correct configuration for spec', () => {
@@ -75,14 +92,14 @@ describe('logger', () => {
         expect(getAppenders()).to.deep.equal(['scriptErr']);
       });
 
-      it('uses the app configuration when the app env is tweaked to simulate a local app', () => {
+      it('uses the localApp configuration when the app env is tweaked to simulate a non-CF app', () => {
         appEnv.rootDir = path.join('home', 'app');
         appEnv.mainFile = path.join(appEnv.rootDir, 'server', 'server.js');
         logger.configure();
-        expect(getAppenders()).to.deep.equal(['appOut']);
+        expect(getAppenders()).to.deep.equal(['localAppOut']);
       });
 
-      it('uses the app configuration when the cfApp env is tweaked to simulate a CF app', () => {
+      it('uses the cfApp configuration when the app env is tweaked to simulate a CF app', () => {
         appEnv.rootDir = path.join('home', 'app');
         appEnv.mainFile = path.join(appEnv.rootDir, 'server', 'server.js');
         process.env.VCAP_APPLICATION = '{}';
