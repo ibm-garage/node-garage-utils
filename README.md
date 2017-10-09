@@ -3,7 +3,7 @@
 
 # Garage Utilities for Node
 
-This module provides a number of common utilities for Node/Express applications at the Bluemix
+This module provides a number of common utilities for Node/Express applications at the IBM Cloud
 Garage.
 
 ## Installation
@@ -17,25 +17,30 @@ probably want to add the `--save` option there.
 
 ## APIs
 
-### Application
+### Application Environment
 
 ```
-const { app } = require('garage-utils');
+const { appEnv } = require('garage-utils');
 ```
 
-Provides information about the running application. In most cases, you should just read from (and
-not modify) `app.config`, though it can be useful occasionally to adjust it to simulate a
-different environment for testing purposes.
+Provides information about the running application. In most cases, you should not change these
+values, though doing so can be useful occasionally to simulate a different environment for testing
+purposes. In these cases, calling reset() returns them all to their default values.
 
-#### app.config.rootDir
+#### appEnv.rootDir
 
 The root directory of the application.
 
-#### app.config.isSpec()
+#### appEnv.mainFile
 
-Returns true when Mocha specs are running, false otherwise.
+The full pathname of the application's entry point -- the file that was originally run, not
+included.
 
-#### app.config.env
+#### appEnv.isSpec()
+
+Returns true when running under the Mocha test runner, false otherwise.
+
+#### appEnv.env
 
 The running environment of the application. This can be one of the following four built-in values,
 or any desired custom value:
@@ -49,8 +54,8 @@ Though the NODE_ENV environment variable is a handy mechanism, it's not sufficie
 all the key environments. In particular, there's no accounting for a test environment, which should
 serve bundled client code but produce more verbose logging and error messages on the server.
 
-By default, the utility detects when running under Mocha (i.e. when `app.config.isSpec()` returns
-true) and reports 'unit' in that case. Otherwise, the value is either 'prod' or 'dev', depending on
+By default, the utility detects when running under Mocha (i.e. when `appEnv.isSpec()` returns true)
+and reports 'unit' in that case. Otherwise, the value is either 'prod' or 'dev', depending on
 whether the NODE_ENV environment variable is 'production' or something else (or undefined). This
 aligns with the way Express interprets that environment variable.
 
@@ -62,33 +67,25 @@ tests; otherwise, they will be mistaken for unit tests.
 The following four functions are also provided to more easily test for a particular environment,
 avoiding the need for string comparisons.
 
-#### app.config.isUnit()
+#### appEnv.isUnit()
 
-Returns true when `app.config` is 'unit', false otherwise.
+Returns true when `appEnv.env` is 'unit', false otherwise.
 
-#### app.config.isDev()
+#### appEnv.isDev()
 
-Returns true when `app.config` is 'dev', false otherwise.
+Returns true when `appEnv.env` is 'dev', false otherwise.
 
-#### app.config.isTest()
+#### appEnv.isTest()
 
-Returns true when `app.config` is 'test', false otherwise.
+Returns true when `appEnv.env` is 'test', false otherwise.
 
-#### app.config.isProd()
+#### appEnv.isProd()
 
-Returns true when `app.config` is 'prod', false otherwise.
+Returns true when `appEnv.env` is 'prod', false otherwise.
 
-The underlying functions that compute the initial `app.config` property values are also exposed.
-Generally, they need only be used to reset the values on `app.config` after adjusting them for
-testing.
+#### appEnv.reset()
 
-#### app.rootDir()
-
-Returns the computed root directory that was used to initialize `app.config.rootDir`.
-
-#### app.env()
-
-Returns the computed environment that was used to initialize `app.config.env`.
+Resets `appEnv.rootDir`, `appEnv.mainFile`, and `appEnv.env` to their default values.
 
 
 ### Time
@@ -276,11 +273,16 @@ Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse 
 Cloud Foundry-provided environment variables, with better fallback handling for running locally
 and additional functions for querying service credentials.
 
-#### cf.getAppEnv()
+#### cf.cfEnv()
 
-Returns the core bits of Clound Foundry data, as detailed the cfenv docs. This is a singleton.
+Returns the core bits of Clound Foundry data. This is a singleton.
 
-If the `VCAP_SERVICES` environment variable is not defined, this function looks for a file named `services.json` in the root directory of the application and, if it exists, uses it to populate the
+This function is equivalent to `getAppEnv()` in cfenv, and the result has all of the properties
+detailed in the cfenv docs, plus some extras described here. The reason for the different name is
+to avoid confusion, since garage-utils already has an `appEnv`.
+
+If the `VCAP_SERVICES` environment variable is not defined, `cfEnv()` looks for a file named
+`services.json` in the root directory of the application and, if it exists, uses it to populate the
 services, instead.
 
 Copying the contents of `VCAP_SERVICES` from a configured Cloud Foundry application into a
@@ -289,7 +291,7 @@ Copying the contents of `VCAP_SERVICES` from a configured Cloud Foundry applicat
 
 The returned object is augmented with two additional functions:
 
-##### appEnv.getServiceCredsByLabel(labelSpec)
+##### cfEnv.getServiceCredsByLabel(labelSpec)
 
 Returns the credentials object of a service by label (i.e. by the name of the service, not the name
 of the service instance). The labelSpec can be either a regular expression or a string (in which
@@ -299,10 +301,10 @@ matched service, this function throws an error.
 Note, however, that if the labelSpec is a regular expression that matches more than one service
 label, the instance of the first service will be returned.
 
-##### appEnv.getServiceCredsByName(nameSpec)
+##### cfEnv.getServiceCredsByName(nameSpec)
 
 Returns the credentials object of a service by name (i.e. by instance name). This works just like
-`appEnv.getServiceCreds(spec)`, except it throws an exception if no service is found.
+`cfEnv.getServiceCreds(spec)`, except it throws an exception if no service is found.
 
 ## License
 

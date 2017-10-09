@@ -1,8 +1,7 @@
 'use strict';
 
-const chai = require('chai');
-const expect = chai.expect;
-const errors = require('../index').errors;
+const { expect } = require('chai');
+const { errors } = require('../index');
 
 const cause = { description: 'kaboom' };
 

@@ -3,7 +3,7 @@
 'use strict';
 
 module.exports = {
-  app: require('./lib/app'),
+  appEnv: require('./lib/appEnv'),
   time: require('./lib/time'),
   errors: require('./lib/errors'),
   logger: require('./lib/logger'),

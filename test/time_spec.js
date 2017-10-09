@@ -1,9 +1,8 @@
 'use strict';
 
-const chai = require('chai');
-const expect = chai.expect;
+const { expect } = require('chai');
 const moment = require('moment');
-const time = require('../index').time;
+const { time } = require('../index');
 
 describe('time', () => {
   describe('parseUnixTime()', () => {
