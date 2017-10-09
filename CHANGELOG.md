@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.0.1"></a>
+## [2.0.1](https://github.com/ibm-garage/node-garage-utils/compare/v2.0.0...v2.0.1) (2017-10-09)
+
+
+First automated release.
+
+
 <a name="2.0.0"></a>
 # [2.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v1.0.1...v2.0.0) (2017-10-09)
 
@@ -23,7 +30,6 @@ The appEnv name better reflects the intent and avoids naming conflicts with the 
 * **logger:** removed old logging API
 
 Clients must move to the new logger API, and should remove direct usage of winston and morgan. The new API hides all the details of the underlying logging framework.
-
 
 
 <a name="1.0.1"></a>
