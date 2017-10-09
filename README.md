@@ -40,6 +40,11 @@ included.
 
 Returns true when running under the Mocha test runner, false otherwise.
 
+#### appEnv.isScript()
+
+Returns true when running as a script or binary (in `scripts` or `bin`, under the application root
+directory or within the garage-utils module).
+
 #### appEnv.env
 
 The running environment of the application. This can be one of the following four built-in values,

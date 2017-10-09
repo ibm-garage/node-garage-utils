@@ -62,17 +62,16 @@ describe('app', () => {
       });
 
       describe('when the main module is tweaked to simulate a non-testing environment', () => {
-        let origMainFilename, origNodeEnv;
+        let origNodeEnv;
 
         beforeEach(() => {
-          origMainFilename = require.main.filename;
           origNodeEnv = process.env.NODE_ENV;
-          require.main.filename = path.join(appEnv._rootDir(), 'app.js');
+          appEnv.mainFile = path.join(appEnv._rootDir(), 'app.js');
         });
 
         afterEach(() => {
-          require.main.filename = origMainFilename;
           process.env.NODE_ENV = origNodeEnv;
+          appEnv.reset();
         });
 
         it("returns 'dev' if the NODE_ENV environment variable is not set", () => {
@@ -135,8 +134,41 @@ describe('app', () => {
     });
 
     it('returns false when the main module is tweaked to simulate a non-testing environment', () => {
-      appEnv.mainFile = path.join(appEnv._rootDir(), 'app.js');
+      appEnv.mainFile = path.join(appEnv.rootDir, 'app.js');
       expect(appEnv.isSpec()).to.be.false;
+    });
+  });
+
+  describe('isScript()', () => {
+    afterEach(() => {
+      appEnv.reset();
+    });
+
+    it('returns false in an unmodified unit testing environment, where mocha is the main module', () => {
+      expect(appEnv.isScript()).to.be.false;
+    });
+
+    it('returns true when the main module is tweaked to simulate an app script', () => {
+      appEnv.rootDir = path.join('home', 'app');
+      appEnv.mainFile = path.join(appEnv.rootDir, 'scripts', 'initdb');
+      expect(appEnv.isScript()).to.be.true;
+    });
+
+    it('returns true when the main module is tweaked to simulate an app binary', () => {
+      appEnv.rootDir = path.join('home', 'app');
+      appEnv.mainFile = path.join(appEnv.rootDir, 'bin', 'initdb');
+      expect(appEnv.isScript()).to.be.true;
+    });
+
+    it('returns true when the main module is tweaked to simulate a module binary', () => {
+      appEnv.mainFile = path.join(appEnv.rootDir, 'bin', 'secrets');
+      expect(appEnv.isScript()).to.be.true;
+    });
+
+    it('returns false when the main module is anything else', () => {
+      appEnv.rootDir = path.join('home', 'app');
+      appEnv.mainFile = path.join(appEnv.rootDir, 'server', 'server.js');
+      expect(appEnv.isScript()).to.be.false;
     });
   });
 
