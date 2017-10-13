@@ -15,14 +15,17 @@
     "test:unit:watch": "mocha --watch test/**/*.js",
     "test:unit:cover": "istanbul cover _mocha test/**/*.js",
     "lint": "eslint index.js lib test",
-    "format": "prettier --write '*.@(js|json)' '@(lib|test)/**/*.@(js|json)'",
+    "format": "prettier --write '**/*.@(js|json)'",
     "release": "standard-version"
   },
   "engines": {
     "node": ">=6.4.0",
     "npm": ">=3.5.3"
   },
-  "files": ["index.js", "lib/"],
+  "files": [
+    "index.js",
+    "lib/"
+  ],
   "dependencies": {
     "cfenv": "^1.0.4",
     "log4js": "^2.3.4",
