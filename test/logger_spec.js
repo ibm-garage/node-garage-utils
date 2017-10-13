@@ -7,6 +7,23 @@ const log4js = require('log4js');
 const { logger, appEnv } = require('../index');
 
 describe('logger', () => {
+  let origVcapApplication, origLogLevel;
+  before(() => {
+    origVcapApplication = process.env.VCAP_APPLICATION;
+    origLogLevel = process.env.LOG_LEVEL;
+    delete process.env.VCAP_APPLICATION;
+    delete process.env.LOG_LEVEL;
+  });
+
+  after(() => {
+    if (typeof origVcapApplication !== 'undefined') {
+      process.env.VCAP_APPLICATION = origVcapApplication;
+    }
+    if (typeof origLogLevel !== 'undefined') {
+      process.env.LOG_LEVEL = origLogLevel;
+    }
+  });
+
   describe('configure()', () => {
     // The logger utility only calls log4js.configure() once, as the framework expects. Though
     // these tests reset the utility, they use a stub on log4js.configure() to check the
@@ -107,6 +124,59 @@ describe('logger', () => {
         expect(getAppenders()).to.deep.equal(['cfAppOut']);
       });
     });
+
+    describe('selects the correct default level', () => {
+      afterEach(() => {
+        appEnv.reset();
+        delete process.env.LOG_LEVEL;
+      });
+
+      it('uses info for app configuration in prod environment', () => {
+        appEnv.env = 'prod';
+        logger.configure({ type: 'app' });
+        expect(logger._settings().defaultLevel).to.equal('info');
+      });
+
+      it('uses debug for app configuration in non-prod environment', () => {
+        appEnv.env = 'dev';
+        logger.configure({ type: 'app' });
+        expect(logger._settings().defaultLevel).to.equal('debug');
+      });
+
+      it('uses level all for spec configuration', () => {
+        logger.configure({ type: 'spec' });
+        expect(logger._settings().defaultLevel).to.equal('all');
+      });
+
+      it('uses level warn for script configuration', () => {
+        logger.configure({ type: 'script' });
+        expect(logger._settings().defaultLevel).to.equal('warn');
+      });
+
+      it('uses a valid level specified in LOG_LEVEL environment variable', () => {
+        process.env.LOG_LEVEL = 'error';
+        logger.configure();
+        expect(logger._settings().defaultLevel).to.equal('error');
+      });
+
+      it('ignores an invalid LOG_LEVEL value and uses the default', () => {
+        process.env.LOG_LEVEL = 'invalid';
+        logger.configure();
+        expect(logger._settings().defaultLevel).to.equal('all');
+      });
+    });
+
+    describe('selects the correct command name', () => {
+      it('uses the name option if specified', () => {
+        logger.configure({ type: 'script', name: 'hello' });
+        expect(logger._settings().name).to.equal('hello');
+      });
+
+      it('uses the basename of the main file if no name option is specified', () => {
+        logger.configure({ type: 'script' });
+        expect(logger._settings().name).to.equal('_mocha');
+      });
+    });
   });
 
   describe('setLevel()', () => {
@@ -130,7 +200,7 @@ describe('logger', () => {
       expect(getLevel()).to.equal('all');
     });
 
-    it('resets to the default level is none is specified', () => {
+    it('resets to the default level if none is specified', () => {
       logger.setLevel('fatal');
       logger.setLevel();
       expect(getLevel()).to.equal('all');

@@ -211,7 +211,8 @@ stderr. This prevents expected log output from messing up the test reports.
 
 Scripts log to stderr at level 'warn' and above by default.
 
-In all cases, the logging level can be set dynamically by the application.
+In all cases, the logging level can be overridden via a `LOG_LEVEL` environment variable and set
+dynamically by the application (see `logger.setLevel()`).
 
 #### logger.configure([options])
 
@@ -236,7 +237,9 @@ The level may be one of 'all', 'trace', 'debug', 'info', 'warn', 'error', 'fatal
 that 'all' and 'trace' currently have the same effect. The only difference is that, if you specifiy
 'all', any new, lower levels that might be added in the future would be included automatically.
 
-If a level is not specified, logging resets to the default level for the environment.
+If a level is not specified or the specified level is invalid, logging resets to the level defined
+by the `LOG_LEVEL` environment variable or, if there is none, to the default level for the
+environment.
 
 #### logger.log(level, ...args)
 
