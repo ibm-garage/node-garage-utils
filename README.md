@@ -154,6 +154,10 @@ Creates a 400 Bad request error, with optional detail and cause.
 
 Creates a 401 Unauthorized error, with optional cause.
 
+#### errors.forbidden(detail, cause)
+
+Creates a 403 Forbidden error, with optional detail and cause.
+
 #### errors.notFound(cause)
 
 Creates a 404 Not found error, with optional cause.
