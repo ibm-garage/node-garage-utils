@@ -43,6 +43,13 @@ describe('errors', () => {
     expect(error.cause).to.deep.equal(cause);
   });
 
+  it("forbidden() returns a 403 'Forbidden' error with specified detail and cause", () => {
+    const error = errors.forbidden('invalid range', cause);
+    expect(error.message).to.equal('Forbidden: invalid range');
+    expect(error.status).to.equal(403);
+    expect(error.cause).to.deep.equal(cause);
+  });
+
   it("notFound() returns a 404 'Not found' error with specified cause", () => {
     const error = errors.notFound(cause);
     expect(error.message).to.equal('Not found');
