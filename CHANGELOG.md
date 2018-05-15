@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.2.0"></a>
+# [2.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v2.1.0...v2.2.0) (2018-05-15)
+
+
+### Features
+
+* **appEnv:** add version (populated from package.json) ([e3b322a](https://github.com/ibm-garage/node-garage-utils/commit/e3b322a))
+
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v2.0.1...v2.1.0) (2018-03-08)
 
