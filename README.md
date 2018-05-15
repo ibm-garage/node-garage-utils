@@ -37,6 +37,11 @@ The root directory of the application.
 The full pathname of the application's entry point -- the file that was originally run, not
 included.
 
+#### appEnv.version
+
+The version of the application, as read from the `package.json` file in the application's root
+directory (undefined if there is no version or no `package.json` file at all).
+
 #### appEnv.isSpec()
 
 Returns true when running under the Mocha test runner, false otherwise.
@@ -51,10 +56,10 @@ directory or within the garage-utils module).
 The running environment of the application. This can be one of the following four built-in values,
 or any desired custom value:
 
-- 'unit' for unit testing
-- 'dev' for development
-- 'test' for integration testing and deployment to test environments
-- 'prod' for production deployment.
+* 'unit' for unit testing
+* 'dev' for development
+* 'test' for integration testing and deployment to test environments
+* 'prod' for production deployment.
 
 Though the NODE_ENV environment variable is a handy mechanism, it's not sufficient to account for
 all the key environments. In particular, there's no accounting for a test environment, which should
@@ -93,7 +98,6 @@ Returns true when `appEnv.env` is 'prod', false otherwise.
 
 Resets `appEnv.rootDir`, `appEnv.mainFile`, and `appEnv.env` to their default values.
 
-
 ### Time
 
 ```
@@ -125,7 +129,6 @@ Converts a moment to an ISO 8601 date-time string with a 0 UTC offset (Z).
 #### time.nowIsoUtc()
 
 Returns the current time as an ISO 8601 date-time string with a 0 UTC offset (Z).
-
 
 ### Errors
 
@@ -183,7 +186,6 @@ Returns an object that may be used as a JSON response body for the given error.
 Returns a string combining the stack traces for the given error and up to 4 levels of nested
 causes.
 
-
 ### Logger
 
 ```
@@ -199,14 +201,14 @@ be handled appropriately for the context in which the code runs.
 
 #### Levels
 
-| Level | Description |
-| - | - |
-| trace | The lowest-level messages that help you follow execution flow. |
-| debug | Detailed messages for isolating problems in the code. |
-| info | Occasional messages reporting task completion and status. |
-| warn | Warning messages identifying when something goes wrong that doesn't result in an error. |
-| error | Error messages for failures that prevent a request or an action from completing. |
-| fatal | Fatal errors that result in the application being terminated. |
+| Level | Description                                                                             |
+| ----- | --------------------------------------------------------------------------------------- |
+| trace | The lowest-level messages that help you follow execution flow.                          |
+| debug | Detailed messages for isolating problems in the code.                                   |
+| info  | Occasional messages reporting task completion and status.                               |
+| warn  | Warning messages identifying when something goes wrong that doesn't result in an error. |
+| error | Error messages for failures that prevent a request or an action from completing.        |
+| fatal | Fatal errors that result in the application being terminated.                           |
 
 By default, applications in production log to stdout at level 'info' and above. Applications
 running in other environments log to stdout at level 'debug' and above.
@@ -223,12 +225,12 @@ dynamically by the application (see `logger.setLevel()`).
 
 Configures the logger. Normally, this does not need to be called, as the logger will correctly
 configure itself for a conventional Garage application. However, you may call this function once,
-*before logging anything*, to specify non-default logger options. Currently, two properties are
+_before logging anything_, to specify non-default logger options. Currently, two properties are
 supported in the options object:
 
-- **type**: the type of environment, one of 'localApp', 'cfApp', 'app' (to automatically select
+* **type**: the type of environment, one of 'localApp', 'cfApp', 'app' (to automatically select
   between local or CF), 'spec', or 'script'
-- **name**: for type 'script' only, the name of the script or command to be shown at the beginning
+* **name**: for type 'script' only, the name of the script or command to be shown at the beginning
   of each message (if not specified, the basename of `appEnv.mainFile` is used by default).
 
 If called after the logger has already been configured or used, this function does nothing.
@@ -297,7 +299,6 @@ fully described in the
 reasonable default values for level ('debug') and format, so normally you won't need to provide
 any options.
 
-
 ### Cloud Foundry
 
 ```
@@ -322,7 +323,7 @@ services, instead.
 
 Copying the contents of `VCAP_SERVICES` from a configured Cloud Foundry application into a
 `services.json` file allows for running the application locally. **Note:** Such a file should
-*not* be committed to source control.
+_not_ be committed to source control.
 
 The returned object is augmented with two additional functions:
 

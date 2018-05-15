@@ -42,6 +42,25 @@ describe('app', () => {
     });
   });
 
+  describe('_version()', () => {
+    const rootDir = appEnv.rootDir;
+    const testDir = path.join(rootDir, 'test');
+
+    afterEach(() => {
+      appEnv.rootDir = rootDir;
+    });
+
+    it('reads the version from package.json in the root dir', () => {
+      appEnv.rootDir = testDir;
+      expect(appEnv._version()).to.equal('1.2.3');
+    });
+
+    it('returns undefined if the package.json file is not found', () => {
+      appEnv.rootDir = path.join(testDir, 'bad');
+      expect(appEnv._version()).to.be.undefined;
+    });
+  });
+
   describe('_env()', () => {
     beforeEach(() => {
       delete process.env.GAPP_ENV;
@@ -100,6 +119,10 @@ describe('app', () => {
     expect(appEnv.mainFile).to.equal(require.main.filename);
   });
 
+  it('has a valid version value by default', () => {
+    expect(appEnv.version).to.match(/^\d+\.\d+\.\d+$/);
+  });
+
   it('has the default env value', () => {
     expect(appEnv.env).to.equal(appEnv._env());
   });
@@ -115,6 +138,12 @@ describe('app', () => {
       appEnv.mainFile = 'changed';
       appEnv.reset();
       expect(appEnv.mainFile).to.equal(require.main.filename);
+    });
+
+    it('resets the version to its default value', () => {
+      appEnv.version = 'changed';
+      appEnv.reset();
+      expect(appEnv.version).to.equal(appEnv._version());
     });
 
     it('resets the env to its default value', () => {
