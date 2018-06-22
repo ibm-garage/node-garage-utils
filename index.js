@@ -1,11 +1,8 @@
 /* eslint global-require: "off" */
-
-'use strict';
-
 module.exports = {
-  appEnv: require('./lib/appEnv'),
-  time: require('./lib/time'),
-  errors: require('./lib/errors'),
-  logger: require('./lib/logger'),
-  cf: require('./lib/cf')
+  appEnv: require("./lib/appEnv"),
+  time: require("./lib/time"),
+  errors: require("./lib/errors"),
+  logger: require("./lib/logger"),
+  cf: require("./lib/cf")
 };
