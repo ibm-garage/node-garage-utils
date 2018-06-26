@@ -367,5 +367,34 @@ describe("logger", () => {
       expressLogger(req, res, next);
       expect(next.calledOnce).to.be.true;
     });
+
+    describe("works with a real parent logger", () => {
+      it("logs a request to the underlying stream", done => {
+        const req = { connection: true, method: "GET", url: "https://example.com/api" };
+        const expressLogger = logger.expressLogger({ resLevel: false });
+        const stream = logger.streams[0].stream;
+        const bytesWritten = stream.bytesWritten;
+        expressLogger(req, res, next);
+        setTimeout(() => {
+          expect(stream.bytesWritten).to.be.above(bytesWritten);
+          done();
+        }, 25);
+      });
+
+      it("logs a response to the underlying stream", done => {
+        const req = {};
+        res.statusCode = 200;
+        res.getHeaders = () => ({ "content-type": "application/json" });
+        const expressLogger = logger.expressLogger({ reqLevel: false });
+        const stream = logger.streams[0].stream;
+        const bytesWritten = stream.bytesWritten;
+        expressLogger(req, res, next);
+        res.emit("finish");
+        setTimeout(() => {
+          expect(stream.bytesWritten).to.be.above(bytesWritten);
+          done();
+        }, 25);
+      });
+    });
   });
 });
