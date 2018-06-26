@@ -289,7 +289,8 @@ is made available as `request.logger` for further use while handling the request
 
 The recognized options:
 
-- **baseLogger**: The parent for middleware-created loggers. Default: the default `logger` instance.
+- **parentLogger**: The parent for middleware-created loggers. Default: the default `logger`
+  instance.
 - **reqLevel**: The level at which to log requests. One of the 6 recognized level names, or false
   to disable request logging. Default: "info".
 - **resLevel**: The level at which to log responses. One of the 6 recognized level names, or false

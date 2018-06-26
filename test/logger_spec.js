@@ -260,10 +260,10 @@ describe("logger", () => {
     }
 
     const req_id = "id1";
-    let baseLogger, res, next;
+    let parentLogger, res, next;
 
     beforeEach(() => {
-      baseLogger = new MockLogger();
+      parentLogger = new MockLogger();
       res = new events.EventEmitter();
       next = sinon.fake();
     });
@@ -272,15 +272,21 @@ describe("logger", () => {
       sinon.restore();
     });
 
-    it("creates a child of the base logger and adds it to the request as req.logger", () => {
+    it("creates a child of the parentLogger and adds it to the request as req.logger", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger });
+      const expressLogger = logger.expressLogger({ parentLogger });
       expressLogger(req, res, next);
-      expect(baseLogger.child.calledOnce).to.be.true;
+      expect(parentLogger.child.calledOnce).to.be.true;
       expect(req.logger).to.be.an.instanceOf(MockLogger);
     });
 
-    it("uses the default logger as a base if none is specified", () => {
+    it("supports the old baseLogger option name if parentLogger is not specified", () => {
+      const expressLogger = logger.expressLogger({ baseLogger: parentLogger });
+      expressLogger({}, res, next);
+      expect(parentLogger.child.calledOnce).to.be.true;
+    });
+
+    it("uses the default logger as a parent if none is specified", () => {
       sinon.replace(logger, "child", sinon.fake(options => new MockLogger(options)));
       const expressLogger = logger.expressLogger();
       expressLogger({}, res, next);
@@ -289,14 +295,14 @@ describe("logger", () => {
 
     it("initializes the request logger to log req_id if the request has an id property", () => {
       const req = { id: req_id };
-      const expressLogger = logger.expressLogger({ baseLogger });
+      const expressLogger = logger.expressLogger({ parentLogger });
       expressLogger(req, res, next);
       expect(req.logger).to.have.deep.property("options", { req_id });
     });
 
     it("logs the request as info by default", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger });
+      const expressLogger = logger.expressLogger({ parentLogger });
       expressLogger(req, res, next);
       expect(req.logger.info.calledOnce).to.be.true;
       expect(req.logger.info.getCall(0).args[0]).to.have.property("req", req);
@@ -304,7 +310,7 @@ describe("logger", () => {
 
     it("logs the request at the specified reqLevel", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger, reqLevel: "debug" });
+      const expressLogger = logger.expressLogger({ parentLogger, reqLevel: "debug" });
       expressLogger(req, res, next);
       expect(req.logger.debug.calledOnce).to.be.true;
       expect(req.logger.debug.getCall(0).args[0]).to.have.property("req", req);
@@ -312,20 +318,20 @@ describe("logger", () => {
 
     it("does not log the request if reqLevel is falsey", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger, reqLevel: false });
+      const expressLogger = logger.expressLogger({ parentLogger, reqLevel: false });
       expressLogger(req, res, next);
       expect(req.logger.info.called).to.be.false;
     });
 
     it("throws immediately if reqLevel is not a valid level", () => {
       expect(() => {
-        logger.expressLogger({ baseLogger, reqLevel: "verbose" });
+        logger.expressLogger({ parentLogger, reqLevel: "verbose" });
       }).to.throw("Invalid reqLevel");
     });
 
     it("logs the response on finish as info by default", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger });
+      const expressLogger = logger.expressLogger({ parentLogger });
       expressLogger(req, res, next);
       res.emit("finish");
       expect(req.logger.info.calledTwice).to.be.true;
@@ -334,7 +340,7 @@ describe("logger", () => {
 
     it("logs the response on finish at the specified resLevel", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger, resLevel: "trace" });
+      const expressLogger = logger.expressLogger({ parentLogger, resLevel: "trace" });
       expressLogger(req, res, next);
       res.emit("finish");
       expect(req.logger.trace.calledOnce).to.be.true;
@@ -343,7 +349,7 @@ describe("logger", () => {
 
     it("does not log the response if resLevel is falsey", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger, resLevel: "" });
+      const expressLogger = logger.expressLogger({ parentLogger, resLevel: "" });
       expressLogger(req, res, next);
       res.emit("finish");
       expect(req.logger.info.calledTwice).to.be.false;
@@ -351,13 +357,13 @@ describe("logger", () => {
 
     it("throws immediately if resLevel is not a valid level", () => {
       expect(() => {
-        logger.expressLogger({ baseLogger, resLevel: "child" });
+        logger.expressLogger({ parentLogger, resLevel: "child" });
       }).to.throw("Invalid resLevel");
     });
 
     it("calls next() to invoke the next middleware", () => {
       const req = {};
-      const expressLogger = logger.expressLogger({ baseLogger });
+      const expressLogger = logger.expressLogger({ parentLogger });
       expressLogger(req, res, next);
       expect(next.calledOnce).to.be.true;
     });
