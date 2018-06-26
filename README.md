@@ -21,7 +21,7 @@ probably want to add the `--save` option there.
 ### Application Environment
 
 ```
-const { appEnv } = require('garage-utils');
+const { appEnv } = require("garage-utils");
 ```
 
 Provides information about the running application. In most cases, you should not change these
@@ -56,22 +56,22 @@ directory or within the garage-utils module).
 The running environment of the application. This can be one of the following four built-in values,
 or any desired custom value:
 
-* 'unit' for unit testing
-* 'dev' for development
-* 'test' for integration testing and deployment to test environments
-* 'prod' for production deployment.
+- "unit" for unit testing
+- "dev" for development
+- "test" for integration testing and deployment to test environments
+- "prod" for production deployment.
 
 Though the NODE_ENV environment variable is a handy mechanism, it's not sufficient to account for
 all the key environments. In particular, there's no accounting for a test environment, which should
 serve bundled client code but produce more verbose logging and error messages on the server.
 
 By default, the utility detects when running under Mocha (i.e. when `appEnv.isSpec()` returns true)
-and reports 'unit' in that case. Otherwise, the value is either 'prod' or 'dev', depending on
-whether the NODE_ENV environment variable is 'production' or something else (or undefined). This
+and reports "unit" in that case. Otherwise, the value is either "prod" or "dev", depending on
+whether the NODE_ENV environment variable is "production" or something else (or undefined). This
 aligns with the way Express interprets that environment variable.
 
-It is also possible to set a GAPP_ENV environment variable to one of 'unit', 'dev', 'test', or
-'prod', or to any custom value, to override these defaults. Note that setting GAPP_ENV is the only
+It is also possible to set a GAPP_ENV environment variable to one of "unit", "dev", "test", or
+"prod", or to any custom value, to override these defaults. Note that setting GAPP_ENV is the only
 way to get a test environment. You should definitely do this when using Mocha to run integration
 tests; otherwise, they will be mistaken for unit tests.
 
@@ -80,19 +80,19 @@ avoiding the need for string comparisons.
 
 #### appEnv.isUnit()
 
-Returns true when `appEnv.env` is 'unit', false otherwise.
+Returns true when `appEnv.env` is "unit", false otherwise.
 
 #### appEnv.isDev()
 
-Returns true when `appEnv.env` is 'dev', false otherwise.
+Returns true when `appEnv.env` is "dev", false otherwise.
 
 #### appEnv.isTest()
 
-Returns true when `appEnv.env` is 'test', false otherwise.
+Returns true when `appEnv.env` is "test", false otherwise.
 
 #### appEnv.isProd()
 
-Returns true when `appEnv.env` is 'prod', false otherwise.
+Returns true when `appEnv.env` is "prod", false otherwise.
 
 #### appEnv.reset()
 
@@ -101,7 +101,7 @@ Resets `appEnv.rootDir`, `appEnv.mainFile`, and `appEnv.env` to their default va
 ### Time
 
 ```
-const { time } = require('garage-utils');
+const { time } = require("garage-utils");
 ```
 
 Higher-level time handling functions based on [Moment.js](https://momentjs.com/).
@@ -114,7 +114,7 @@ an integer, it will be converted if possible. Returns a UTC moment, or undefined
 #### time.parseIso(isoDateTime)
 
 Strictly parses an ISO 8601 date-time string that must specify a UTC offset (or Z). Returns a
-moment, or undefined if the date is invalid or doesn't have a UTC offset. The moment has the
+moment, or undefined if the date is invalid or doesn"t have a UTC offset. The moment has the
 UTC offset specified in the string by default. You can use `utc()` or `local()` to shift to
 UTC or local time.
 
@@ -133,47 +133,47 @@ Returns the current time as an ISO 8601 date-time string with a 0 UTC offset (Z)
 ### Errors
 
 ```
-const { errors } = require('garage-utils');
+const { errors } = require("garage-utils");
 ```
 
 Creates errors that are easily translated into HTTP responses.
 
-#### errors.error(status, message, detail, cause)
+#### errors.error(status, message, [detail], [cause])
 
 Creates a new `Error` instance with a status code, a message formed from the specified message and
 detail (if truthy), and a nested cause (usually another error).
 
 ```
-const err = errors.errror(500, 'Internal server error', 'Failure in underlying service', caughtErr);
+const err = errors.errror(500, "Internal server error", "Failure in underlying service", caughtErr);
 winston.error(err);
 res.status(err.status).send(err.message);
 ```
 
-#### errors.badRequest(detail, cause)
+#### errors.badRequest([detail], [cause])
 
 Creates a 400 Bad request error, with optional detail and cause.
 
-#### errors.unauthorized(cause)
+#### errors.unauthorized([cause])
 
 Creates a 401 Unauthorized error, with optional cause.
 
-#### errors.forbidden(detail, cause)
+#### errors.forbidden([detail], [cause])
 
 Creates a 403 Forbidden error, with optional detail and cause.
 
-#### errors.notFound(cause)
+#### errors.notFound([cause])
 
 Creates a 404 Not found error, with optional cause.
 
-#### errors.methodNotAllowed(cause)
+#### errors.methodNotAllowed([cause])
 
 Creates a 405 Method not allowed error, with optional cause.
 
-#### errors.conflict(detail, cause)
+#### errors.conflict([detail], [cause])
 
 Creates a 409 Conflict error, with optional detail and cause.
 
-#### errors.internalServerError(cause)
+#### errors.internalServerError([cause])
 
 Creates a 500 Internal server error, with optional cause.
 
@@ -189,120 +189,130 @@ causes.
 ### Logger
 
 ```
-const { logger } = require('garage-utils');
+const { logger } = require("garage-utils");
 ```
 
-Logging support based on [log4js](https://github.com/nomiddlename/log4js-node) that is
-automatically preconfigured for for various different environments, including testing, scripting,
-and runtime (locally and on Cloud Foundry, in development and production).
+Logging support based on [Bunyan](https://github.com/trentm/node-bunyan). Accessing `logger` yields
+a Bunyan logger that is automatically preconfigured for the current environment (testing, scripting,
+or application runtime) and enhanced with a couple of extra functions.
 
-You can use the logging functions defined here for all error and progress reporting, and it will
-be handled appropriately for the context in which the code runs.
+You can use the logging functions described here for all error, status, and debugging information,
+and it will be handled appropriately for the context in which the code runs.
 
 #### Levels
 
-| Level | Description                                                                             |
-| ----- | --------------------------------------------------------------------------------------- |
-| trace | The lowest-level messages that help you follow execution flow.                          |
-| debug | Detailed messages for isolating problems in the code.                                   |
-| info  | Occasional messages reporting task completion and status.                               |
-| warn  | Warning messages identifying when something goes wrong that doesn't result in an error. |
-| error | Error messages for failures that prevent a request or an action from completing.        |
-| fatal | Fatal errors that result in the application being terminated.                           |
+| Level | Value | Description                                                            |
+| ----- | ----- | ---------------------------------------------------------------------- |
+| trace | 10    | Entries from external libraries and most verbose application logging.  |
+| debug | 20    | Detailed entries for isolating problems in the code.                   |
+| info  | 30    | Information on regular operation.                                      |
+| warn  | 40    | Unexpected conditions that should probably be investigated eventually. |
+| error | 50    | Failures that prevent a request or an action from completing.          |
+| fatal | 60    | Fatal errors that result in the application being terminated.          |
 
-By default, applications in production log to stdout at level 'info' and above. Applications
-running in other environments log to stdout at level 'debug' and above.
+By default, applications in all environments log to stdout at level "info" and above. Logged entries
+are emitted as single-line JSON objects for easy collection, indexing, and searching. If you wish to
+watch logs from a single instance in real time (such as when running locally during development),
+you can pipe stdout to the `bunyan` [CLI tool](https://github.com/trentm/node-bunyan#cli-usage) for filtering and pretty-printing.
 
-Automated tests (specs) log all levels to a `test.log` file, plus levels 'warn' and above to
-stderr. This prevents expected log output from messing up the test reports.
+Automated tests (specs) log at level "trace" and above to a `test.log` file, plus levels "warn" and
+above to stderr. This prevents expected log output from messing up the test reports. Scripts log to
+stderr at level "warn" and above by default.
 
-Scripts log to stderr at level 'warn' and above by default.
+For specs and scripts, logging to stderr is internally pretty-printed via the special
+[bunyan-prettystream-circularsafe](https://www.npmjs.com/package/bunyan-prettystream-circularsafe)
+stream implementation.
 
-In all cases, the logging level can be overridden via a `LOG_LEVEL` environment variable and set
-dynamically by the application (see `logger.setLevel()`).
+In all cases, the default logging level can be overridden via a `LOG_LEVEL` environment variable
+and set dynamically by the application using Bunyan's `logger.level()` and `logger.levels()`
+functions.
 
-#### logger.configure([options])
+#### logger.level([level])
 
-Configures the logger. Normally, this does not need to be called, as the logger will correctly
-configure itself for a conventional Garage application. However, you may call this function once,
-_before logging anything_, to specify non-default logger options. Currently, two properties are
-supported in the options object:
+_Bunyan function_: Sets the lowest logging level to be the specified level name (lowercase string)
+or numeric value. If no level is specified, returns the numeric value of the current level.
 
-* **type**: the type of environment, one of 'localApp', 'cfApp', 'app' (to automatically select
-  between local or CF), 'spec', or 'script'
-* **name**: for type 'script' only, the name of the script or command to be shown at the beginning
-  of each message (if not specified, the basename of `appEnv.mainFile` is used by default).
+#### logger.levels(stream, [level])
 
-If called after the logger has already been configured or used, this function does nothing.
+_Bunyan function_: Sets the logging level for a particular stream, identified by name or index. If
+no level is specified, returns the current level.
 
-#### logger.setLevel([level])
+#### logger.trace([fields|err], [message], [...args])
 
-Sets the minimium level to log. This should normally be called immediately upon starting an
-application; however, it is safe to change the level at any point, as the application runs.
+_Bunyan function_: Logs an entry at level trace.
 
-The level may be one of 'all', 'trace', 'debug', 'info', 'warn', 'error', 'fatal', or 'off'. Note
-that 'all' and 'trace' currently have the same effect. The only difference is that, if you specifiy
-'all', any new, lower levels that might be added in the future would be included automatically.
+Bunyan is flexible about how the entry is specified. You can specify an object with custom fields
+(or just an `Error`), as well a message, optionally with data that is formatted in with
+`util.format()`. See the [Bunyan docs](https://github.com/trentm/node-bunyan#log-method-api) for
+all the different possibilities.
 
-If a level is not specified or the specified level is invalid, logging resets to the level defined
-by the `LOG_LEVEL` environment variable or, if there is none, to the default level for the
-environment.
+#### logger.debug([fields|err], [message], [...args])
 
-#### logger.log(level, ...args)
+_Bunyan function_: Logs an entry at level debug.
 
-Logs a message at the specified level.
+#### logger.info([fields|err], [message], [...args])
 
-The level may be one of 'trace', 'debug', 'info', 'warn', 'error', or 'fatal'. The message is
-formed by passing the remaining arguments to
-[`util.format()`](https://nodejs.org/api/util.html#util_util_format_format_args). So, you can pass
-a single message, provide several objects to be inspected and concatenated, or do % placeholder
-replacement. Errors are handled properly, too, logging the trace and additional data.
+_Bunyan function_: Logs an entry at level info.
 
-#### logger.trace(...args)
+#### logger.warn([fields|err], [message], [...args])
 
-Logs a message at level 'trace'.
+_Bunyan function_: Logs an entry at level warn.
 
-#### logger.debug(...args)
+#### logger.error([fields|err], [message], [...args])
 
-Logs a message at level 'debug'.
+_Bunyan function_: Logs an entry at level error.
 
-#### logger.info(...args)
+#### logger.fatal([fields|err], [message], [...args])
 
-Logs a message at level 'info'.
+_Bunyan function_: Logs an entry at level fatal.
 
-#### logger.warn(...args)
+#### logger.child([options], [simple])
 
-Logs a message at level 'warn'.
+_Bunyan function_: Creates and returns a child logger, usually for logging in a particular context
+where certain fields should be bound to the same values.. The child is backed by its parent's
+logging mechanisms (level, serializers, and streams) by default.
 
-#### logger.error(...args)
+For the usual case of binding fields, pass the fields and values in the options argument, and
+specify true for simple. Or, you can override configuration by specifying other options along
+with false for simple. See the [Bunyan docs](https://github.com/trentm/node-bunyan#logchild) for
+more information.
 
-Logs a message at level 'error'.
+#### logger.expressLogger(options)
 
-#### logger.fatal(...args)
+Returns an Express middleware function that creates a child logger for each request and uses it to
+log the request and response. This middleware is best used with (and after)
+[express-request-id](https://www.npmjs.com/package/express-request-id), which generates a unique
+ID for each requests and stores it as `request.id`.
 
-Logs a message at level 'fatal'.
+If that ID is availabile, the child logger binds it to `req_id` for all entries logged. The logger
+is made available as `request.logger` for further use while handling the request.
+
+The recognized options:
+
+- **baseLogger**: The parent for middleware-created loggers. Default: the default `logger` instance.
+- **reqLevel**: The level at which to log requests. One of the 6 recognized level names, or false
+  to disable request logging. Default: "info".
+- **resLevel**: The level at which to log responses. One of the 6 recognized level names, or false
+  to disable response logging. Default: "info".
 
 #### logger.suppressSpecErr(suppress)
 
-In a spec definition, suppresses or reenables logging to stderr (at level 'warning' and above),
+In a spec definition, suppresses or reenables logging to stderr (at level "warning" and above),
 according to whether or not suppress is truthy. This can be used to prevent expected warnings,
-errors, and fatal errors from messing up test reports. **Note: Do not use in application code.**
+errors, and fatal errors from messing up test reports.
 
-#### logger.connectFormatter(options)
+Under the covers, this adjusts the logging level of the stream writing to stderr. So, manually
+changing that level with `logger.levels()` or the overall level with `logger.level()` may disrupt
+this. After doing so, you can call `logger.suppressSpecErr()` again to fix the logging level of
+the stderr stream.
 
-Returns a Connect/Express middleware function that logs requests and responses via the logger.
-
-The recognized options are `level` (the level at which to log), `format` (the Connect logger
-format), and `nolog` (an expression specifying which requests not to log). These options are more
-fully described in the
-[log4js documentation](https://nomiddlename.github.io/log4js-node/connect-logger.html). There are
-reasonable default values for level ('debug') and format, so normally you won't need to provide
-any options.
+**Note**: This function is only available on `logger` in a spec context. _Do not use in application
+code, as it will throw a `TypeError`._
 
 ### Cloud Foundry
 
 ```
-const { cf } = require('garage-utils');
+const { cf } = require("garage-utils");
 ```
 
 Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse and interpret
