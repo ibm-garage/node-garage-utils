@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.1.0"></a>
+# [3.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v3.0.0...v3.1.0) (2018-06-26)
+
+
+### Bug Fixes
+
+* **logger:** fix missing bind() in expressLogger(), which prevented request and response logging ([e477f26](https://github.com/ibm-garage/node-garage-utils/commit/e477f26))
+
+
+### Features
+
+* **logger:** rename expressLogger() option baseLogger to parentLogger (maintaining support for the old name) ([b819fe3](https://github.com/ibm-garage/node-garage-utils/commit/b819fe3))
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v2.2.0...v3.0.0) (2018-06-26)
 
