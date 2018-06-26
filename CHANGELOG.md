@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v2.2.0...v3.0.0) (2018-06-26)
+
+
+### Features
+
+* **logger:** switched logger to Bunyan implementation ([10f08a8](https://github.com/ibm-garage/node-garage-utils/commit/10f08a8))
+
+
+### BREAKING CHANGES
+
+* **logger:** minor changes to the logger API based on the underlying implementation: removed configure() and log(); replaced setLevel() -> logger.level() and connectLogger() -> expressLogger()
+
+Clients must adopt the API changes, and should expect new logging output. Notably, applications will now log in JSON.
+
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v2.1.0...v2.2.0) (2018-05-15)
 
