@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v3.1.0...v3.2.0) (2018-08-14)
+
+
+### Features
+
+* **logger:** automatically redact authorization headers; add expressLogger() options (childOptions and childSimple) and createSerializer() to support custom redaction (and other serializer customization) ([a99739c](https://github.com/ibm-garage/node-garage-utils/commit/a99739c))
+
+
+
 <a name="3.1.0"></a>
 # [3.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v3.0.0...v3.1.0) (2018-06-26)
 
