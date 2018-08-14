@@ -96,7 +96,8 @@ Returns true when `appEnv.env` is "prod", false otherwise.
 
 #### appEnv.reset()
 
-Resets `appEnv.rootDir`, `appEnv.mainFile`, and `appEnv.env` to their default values.
+Resets `appEnv.rootDir`, `appEnv.mainFile`, and `appEnv.env` to their computed values, if any of
+them have been changed.
 
 ### Time
 
@@ -114,7 +115,7 @@ an integer, it will be converted if possible. Returns a UTC moment, or undefined
 #### time.parseIso(isoDateTime)
 
 Strictly parses an ISO 8601 date-time string that must specify a UTC offset (or Z). Returns a
-moment, or undefined if the date is invalid or doesn"t have a UTC offset. The moment has the
+moment, or undefined if the date is invalid or doesn't have a UTC offset. The moment has the
 UTC offset specified in the string by default. You can use `utc()` or `local()` to shift to
 UTC or local time.
 
@@ -291,6 +292,10 @@ The recognized options:
 
 - **parentLogger**: The parent for middleware-created loggers. Default: the default `logger`
   instance.
+- **childOptions**: Additional options for child loggers. Default: `{}`.
+- **childSimple**: Whether to create simple child loggers. Default: true. Specify false if you have
+  specified any childOptions that are not just additional properties to bind (e.g. to use custom
+  level, streams, or serializers).
 - **reqLevel**: The level at which to log requests. One of the 6 recognized level names, or false
   to disable request logging. Default: "info".
 - **resLevel**: The level at which to log responses. One of the 6 recognized level names, or false
@@ -309,6 +314,27 @@ the stderr stream.
 
 **Note**: This function is only available on `logger` in a spec context. _Do not use in application
 code, as it will throw a `TypeError`._
+
+#### logger.createSerializer(options)
+
+A helper function that simplifies creating a custom Bunyan
+[serializer](https://github.com/trentm/node-bunyan#serializers). The recognized options:
+
+- **testProp**: A property to test to recognize handled objects. If the property is undefined or
+  null in an input object, the serializer will simply return the object unchanged. This option is
+  required.
+- **includeProps**: An array of properties that the serializer should copy from the input object
+  to the output JSONable object. If any of the properties are undefined in an input object, they
+  will be excluded from the output. If any of them have an object or array as their value, they
+  will be copied deeply in JSON style (i.e. by own, enumerable properties). Default: `[testProp]`.
+- **computeProps**: An object mapping properties to functions that compute property values. For a
+  given input object, each function will be called with the input object as argument and the
+  result, if not undefined, will be included as a property of the output JSONable object. Any
+  object or array results will be copied deeply in JSON style. Default: `{}`.
+- **redactProps**: An array of properties that should be redacted during deep copying. If any
+  matching property is encountered, "\*\*\*\*\*" will be included, instead of the actual value.
+  Note that redaction is not applied to the included or computed props themselves, but only to
+  properties nested directly or indirectly under them. Default: `[]`.
 
 ### Cloud Foundry
 

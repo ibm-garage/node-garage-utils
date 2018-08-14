@@ -157,6 +157,179 @@ describe("logger", () => {
     });
   });
 
+  describe("createSerializer", () => {
+    it("returns a serializer function", () => {
+      expect(logger.createSerializer()).to.be.a("function");
+    });
+
+    describe("when just a test prop is specified, the serializer", () => {
+      const serializer = logger.createSerializer({ testProp: "a" });
+
+      it("returns undefined unchanged", () => {
+        expect(serializer(undefined)).to.be.undefined;
+      });
+
+      it("returns null unchanged unchanged", () => {
+        expect(serializer(null)).to.be.null;
+      });
+
+      it("returns a non-object value unchanged", () => {
+        expect(serializer("foo")).to.equal("foo");
+      });
+
+      it("returns an object unchanged if it does not include the test prop", () => {
+        const val = { b: "B", c: "C", d: "D" };
+        expect(serializer(val)).to.equal(val);
+      });
+
+      it("copies just the test prop otherwise", () => {
+        const val = { a: "a", b: "B", c: "C", d: "D" };
+        expect(serializer(val)).to.deep.equal({ a: "a" });
+      });
+
+      it("copies the test prop even if it is null", () => {
+        const val = { a: null, b: "B", c: "C", d: "D" };
+        expect(serializer(val)).to.deep.equal({ a: null });
+      });
+    });
+
+    describe("when include props are specified, the serializer", () => {
+      const serializer = logger.createSerializer({ testProp: "a", includeProps: ["b", "c", "d"] });
+
+      it("returns an object unchanged if it does not include the test prop", () => {
+        const val = { b: "B", c: "C", d: "D", e: "E" };
+        expect(serializer(val)).to.equal(val);
+      });
+
+      it("copies just the include props otherwise", () => {
+        const val = { a: "A", b: "B", c: "C", d: "D", e: "E" };
+        expect(serializer(val)).to.deep.equal({ b: "B", c: "C", d: "D" });
+      });
+
+      it("skips any include props that are undefined", () => {
+        const val = { a: "A", c: "C", d: undefined };
+        expect(serializer(val)).to.deep.equal({ c: "C" });
+      });
+
+      it("does not skip any include props that are null", () => {
+        const val = { a: "A", c: "C", d: null };
+        expect(serializer(val)).to.deep.equal({ c: "C", d: null });
+      });
+
+      it("deeply copies any object or array values", () => {
+        const a1 = [1, 2, 3];
+        const o1 = { k1: 1, k2: 2, k3: a1 };
+        const o2 = { k1: "v1", k2: "v2", k3: o1 };
+        const a2 = ["a", "b", "c", o2];
+        const val = { a: "A", b: o2, c: a2 };
+        const result = serializer(val);
+        expect(result).to.deep.equal({ b: o2, c: a2 });
+        expect(result.b).to.not.equal(o2);
+        expect(result.b.k3).to.not.equal(o1);
+        expect(result.b.k3.k3).to.not.equal(a1);
+        expect(result.c).to.not.equal(a2);
+        expect(result.c[3]).to.not.equal(o2);
+        expect(result.c[3].k3).to.not.equal(o1);
+        expect(result.c[3].k3.k3).to.not.equal(a1);
+      });
+    });
+
+    describe("when compute props are specified, the serializer", () => {
+      const serializer = logger.createSerializer({
+        testProp: "a",
+        includeProps: ["b"],
+        computeProps: { c: obj => obj.a + obj.b, d: obj => obj.c }
+      });
+
+      it("evaluates them to compute props and includes them in the result", () => {
+        const val = { a: "A", b: "B", c: "C", d: "D", e: "E" };
+        expect(serializer(val)).to.deep.equal({ b: "B", c: "AB", d: "C" });
+      });
+
+      it("excludes any props that evaluate to undefined", () => {
+        const val = { a: "A", b: "B" };
+        expect(serializer(val)).to.deep.equal({ b: "B", c: "AB" });
+      });
+
+      it("deeply copies props that evaluate to objects", () => {
+        const obj = { k1: 1, k2: 2 };
+        const val = { a: "A", b: "B", c: obj };
+        const result = serializer(val);
+        expect(result).to.deep.equal({ b: "B", c: "AB", d: obj });
+        expect(result.d).to.not.equal(obj);
+      });
+
+      it("deeply copies props that evaluate to arrays", () => {
+        const arr = ["a", "b", "c"];
+        const val = { a: "A", b: "B", c: arr };
+        const result = serializer(val);
+        expect(result).to.deep.equal({ b: "B", c: "AB", d: arr });
+        expect(result.d).to.not.equal(arr);
+      });
+    });
+
+    describe("when redact props are specified, the serializer", () => {
+      const serializer = logger.createSerializer({
+        testProp: "a",
+        includeProps: ["b"],
+        computeProps: { c: obj => obj.d },
+        redactProps: ["secret", "sensitive"]
+      });
+
+      it("redacts any matching props from within the included props", () => {
+        const val = {
+          a: "A",
+          b: {
+            name: "bob",
+            secret: "s3cr3t",
+            data: [
+              {
+                sensitive: { v1: 1, v2: 2 },
+                safe: "safe"
+              }
+            ]
+          },
+          d: { v1: 1, v2: 2, v3: 3 }
+        };
+        const expected = {
+          b: {
+            name: "bob",
+            secret: "*****",
+            data: [{ sensitive: "*****", safe: "safe" }]
+          },
+          c: { v1: 1, v2: 2, v3: 3 }
+        };
+        expect(serializer(val)).to.deep.equal(expected);
+      });
+
+      it("redacts any matching props from within the computed props", () => {
+        const val = {
+          a: "A",
+          b: { v1: 1, v2: 2, v3: 3 },
+          d: {
+            name: "bob",
+            secret: "s3cr3t",
+            data: [
+              {
+                sensitive: { v1: 1, v2: 2 },
+                safe: "safe"
+              }
+            ]
+          }
+        };
+        const expected = {
+          b: { v1: 1, v2: 2, v3: 3 },
+          c: {
+            name: "bob",
+            secret: "*****",
+            data: [{ sensitive: "*****", safe: "safe" }]
+          }
+        };
+        expect(serializer(val)).to.deep.equal(expected);
+      });
+    });
+  });
+
   describe("defaultSerializers", () => {
     const { err, req, res } = logger.serializers;
 
@@ -215,6 +388,14 @@ describe("logger", () => {
         expect(req(orig)).to.deep.equal(expected);
       });
 
+      it("redacts authorization headers", () => {
+        const headers = { acccept: "application/json", authorization: "Basic Ym9iOnBhc3N3MHJk" };
+        const orig = { connection, method, url, headers, extra: "more info" };
+        const expectedHeaders = { acccept: "application/json", authorization: "*****" };
+        const expected = { method, url, headers: expectedHeaders };
+        expect(req(orig)).to.deep.equal(expected);
+      });
+
       it("does not include any selected properties with undefined values", () => {
         const orig = { connection };
         expect(req(orig)).to.deep.equal({});
@@ -237,6 +418,17 @@ describe("logger", () => {
       it("selects statusCode and header by invoking getHeaders() from a res with that function", () => {
         const orig = { statusCode, getHeaders: () => header };
         const expected = { statusCode, header };
+        expect(res(orig)).to.deep.equal(expected);
+      });
+
+      it("filters out authorization headers", () => {
+        const header = {
+          "content-type": "application/json",
+          authorization: "Basic Ym9iOnBhc3N3MHJk"
+        };
+        const orig = { statusCode, getHeaders: () => header };
+        const expectedHeaders = { "content-type": "application/json", authorization: "*****" };
+        const expected = { statusCode, header: expectedHeaders };
         expect(res(orig)).to.deep.equal(expected);
       });
 
@@ -298,6 +490,36 @@ describe("logger", () => {
       const expressLogger = logger.expressLogger({ parentLogger });
       expressLogger(req, res, next);
       expect(req.logger).to.have.deep.property("options", { req_id });
+    });
+
+    it("does not log req_id if the request does not have an id property", () => {
+      const req = {};
+      const expressLogger = logger.expressLogger({ parentLogger });
+      expressLogger(req, res, next);
+      expect(req.logger).to.have.deep.property("options", {});
+    });
+
+    it("includes additional options in the request logger if childOptions is specified", () => {
+      const serializers = [];
+      const childOptions = { serializers };
+      const req = { id: req_id };
+      const expressLogger = logger.expressLogger({ parentLogger, childOptions });
+      expressLogger(req, res, next);
+      expect(req.logger).to.have.deep.property("options", { req_id, serializers });
+    });
+
+    it("creates a simple child logger by default", () => {
+      const req = {};
+      const expressLogger = logger.expressLogger({ parentLogger });
+      expressLogger(req, res, next);
+      expect(parentLogger.child.args[0][1]).to.be.true;
+    });
+
+    it("creates a non-simple child according to the childSimple option if specified", () => {
+      const req = {};
+      const expressLogger = logger.expressLogger({ parentLogger, childSimple: false });
+      expressLogger(req, res, next);
+      expect(parentLogger.child.args[0][1]).to.be.false;
     });
 
     it("logs the request as info by default", () => {
