@@ -44,7 +44,8 @@ directory (undefined if there is no version or no `package.json` file at all).
 
 #### appEnv.isSpec()
 
-Returns true when running under the Mocha test runner, false otherwise.
+Returns true when running under Mocha or under Jest with conventional filenames (`*.spec.js`,
+`*_spec.js`, `*.test.js`, or `*_test.js`), false otherwise.
 
 #### appEnv.isScript()
 
