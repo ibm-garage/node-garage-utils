@@ -152,17 +152,59 @@ describe("app", () => {
   });
 
   describe("isSpec()", () => {
-    afterEach(() => {
-      appEnv.reset();
-    });
-
     it("returns true in an unmodified unit testing environment, where mocha is the main module", () => {
       expect(appEnv.isSpec()).to.be.true;
     });
 
-    it("returns false when the main module is tweaked to simulate a non-testing environment", () => {
-      appEnv.mainFile = path.join(appEnv.rootDir, "app.js");
-      expect(appEnv.isSpec()).to.be.false;
+    describe("when the main module is tweaked to simulate other environments", () => {
+      afterEach(() => {
+        appEnv.reset();
+      });
+
+      it("returns true when the last segment of the main module is _mocha", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "_mocha");
+        expect(appEnv.isSpec()).to.be.true;
+      });
+
+      it("returns false when the last segment of the main module ends with, but is not, _mocha", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "not_mocha");
+        expect(appEnv.isSpec()).to.be.false;
+      });
+
+      it("returns true when the main module ends with .spec.js", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module.spec.js");
+        expect(appEnv.isSpec()).to.be.true;
+      });
+
+      it("returns true when the main module ends with _spec.js", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module_spec.js");
+        expect(appEnv.isSpec()).to.be.true;
+      });
+
+      it("returns false when the main module ends with -spec.js", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module-spec.js");
+        expect(appEnv.isSpec()).to.be.false;
+      });
+
+      it("returns true when the main module ends with .test.js", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module.test.js");
+        expect(appEnv.isSpec()).to.be.true;
+      });
+
+      it("returns true when the main module ends with _test.js", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module_test.js");
+        expect(appEnv.isSpec()).to.be.true;
+      });
+
+      it("returns false when the main module ends with -test.js", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module-test.js");
+        expect(appEnv.isSpec()).to.be.false;
+      });
+
+      it("returns false for other non-testing environments", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "app.js");
+        expect(appEnv.isSpec()).to.be.false;
+      });
     });
   });
 
