@@ -19,17 +19,23 @@
     "release": "standard-version"
   },
   "engines": {
-    "node": ">=6.4.0",
-    "npm": ">=3.5.3"
+    "node": ">=8.0.0",
+    "npm": ">=5.0.0"
   },
   "files": [
     "index.js",
-    "lib/"
+    "lib/",
+    "bin/"
   ],
+  "bin": {
+    "cfutil": "bin/cfutil.js"
+  },
   "dependencies": {
     "bunyan": "^1.8.12",
     "bunyan-prettystream-circularsafe": "^0.3.1",
     "cfenv": "^1.1.0",
+    "commander": "^2.19.0",
+    "eol": "^0.9.1",
     "moment": "^2.22.2"
   },
   "devDependencies": {
