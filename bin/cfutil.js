@@ -2,16 +2,17 @@
 
 const { promisify } = require("util");
 const fs = require("fs");
-const child = require("child_process");
+const childProcess = require("child_process");
 const eol = require("eol");
 const program = require("commander");
 const { stackWithCause } = require("../lib/errors");
 
-const execFile = promisify(child.execFile);
+const execFile = promisify(childProcess.execFile);
+const spawn = childProcess.spawn;
 const writeFile = promisify(fs.writeFile);
 const nl = String(eol.auto);
 
-module.exports = { parseServices, parseUserProvided, envValue };
+module.exports = { parseServices, parseUserProvided, envValue, envScript, splitLines, selectLine };
 
 program.version("4.0.0");
 program
@@ -22,6 +23,14 @@ program
   .option("-s --script", "create an env.sh script to initialize the environment")
   .option("-f --filename <filename>", "output filename (default is .env or services.json)")
   .action(env);
+
+program
+  .command("logs <app>")
+  .description("Retrieve, filter, and trim Cloud Foundry app logs for Bunyan viewing.")
+  .option("-r --recent", "dump recent logs, instead of tailing")
+  .option("-a --app-only", "include only log messages with type APP")
+  .option("-j --json-only", "include only log messages with JSON content")
+  .action(logs);
 
 if (require.main === module) {
   process.on("uncaughtException", handleError);
@@ -102,7 +111,7 @@ async function env(app, options = {}) {
   await writeFile(filename, output + nl);
 
   if (script) {
-    await writeFile("env.sh", scriptContent(filename, json));
+    await writeFile("env.sh", envScript(filename, json));
   }
 }
 
@@ -141,12 +150,67 @@ function envValue(val) {
   return val;
 }
 
-function scriptContent(filename, json) {
-  const filenameWithDefault = "./${1:-" + filename + "}";
-  return `#!/bin/bash
-filename="${filenameWithDefault}"
-set -a
-${json ? 'VCAP_SERVICES=$(cat "$filename")' : '. "$filename"'}
-set +a
-`;
+function envScript(filename, json) {
+  const filenameWithDefault = "${1:-" + filename + "}";
+  const lines = [
+    `filename="${filenameWithDefault}"`,
+    "set -a",
+    json ? 'VCAP_SERVICES=$(cat "$filename")' : '. "$filename"',
+    "set +a"
+  ];
+  return lines.join(nl) + nl;
+}
+
+async function logs(app, { recent = false, appOnly = false, jsonOnly = false } = {}) {
+  await checkCf();
+
+  let lineCount = 0;
+  const args = ["logs"];
+  if (recent) {
+    args.push("--recent");
+  }
+  args.push(app);
+
+  const cf = spawn("cf", args, { stdio: [process.stdin, "pipe", process.stderr] });
+  cf.on("exit", process.exit);
+  cf.stdout.on("data", data => {
+    splitLines(data).forEach(line => {
+      if (lineCount++ < 2) {
+        console.log(line);
+      } else {
+        const match = selectLine(line, appOnly, jsonOnly);
+        if (match) {
+          console.log(match);
+        }
+      }
+    });
+  });
+}
+
+function splitLines(data) {
+  const lines = eol.lf(data.toString()).split("\n");
+  if (!lines[lines.length - 1]) {
+    lines.pop();
+  }
+  return lines;
+}
+
+function selectLine(line, appOnly, jsonOnly) {
+  const match = /^ +[-:.TZ0-9]+ \[(.*?)] [A-Z]+(.*)$/.exec(line);
+  if (!match) {
+    return jsonOnly ? false : line;
+  }
+  if (appOnly && !match[1].startsWith("APP/")) {
+    return false;
+  }
+
+  const message = match[2].trim();
+  const isJson = message.startsWith("{") && message.endsWith("}");
+  if (isJson) {
+    return message;
+  }
+  if (!jsonOnly) {
+    return line.trim();
+  }
+  return false;
 }
