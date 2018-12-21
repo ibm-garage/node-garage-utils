@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - node
-  - "6.4.0"
+  - "8.0.0"
 after_script: cat coverage/lcov.info | node_modules/.bin/coveralls
 jobs:
   include:
