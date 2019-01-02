@@ -1,6 +1,5 @@
 const { expect } = require("chai");
-const path = require("path");
-const { appEnv, cf } = require("../index");
+const { cf } = require("../index");
 
 const cloudantCreds = {
   host: "host-bluemix.cloudant.com",
@@ -10,35 +9,49 @@ const cloudantCreds = {
   username: "user"
 };
 
-const userProvidedCreds = {
+const ups1Creds = {
   host: "service1.com",
   url: "https://service1.com/api/v1"
 };
 
-const vcapServices =
-  '{"discovery":[{"credentials":{"password":"passw0rd","url":"https://gateway.watsonplatform.net/discovery/api","username":"user"},"label":"discovery","name":"cyberguardian-discovery","plan":"lite","provider":null,"syslog_drain_url":null}]}';
+const ups2Creds = {
+  host: "service2.com",
+  url: "https://service2.com/api/v1"
+};
 
-const rootDir = appEnv.rootDir;
-const testDir = path.join(rootDir, "test");
+const services = {
+  cloudantNoSQLDB: [
+    {
+      credentials: cloudantCreds,
+      label: "cloudantNoSQLDB",
+      name: "test-cloudantdb",
+      plan: "Shared",
+      tags: ["data_management", "ibm_created", "ibm_dedicated_public"]
+    }
+  ],
+  "user-provided": [
+    {
+      credentials: ups1Creds,
+      label: "user-provided",
+      name: "service1",
+      syslog_drain_url: "",
+      tags: []
+    },
+    {
+      credentials: ups2Creds,
+      label: "user-provided",
+      name: "service2",
+      syslog_drain_url: "",
+      tags: []
+    }
+  ]
+};
 
-function mockServicesFile(mock) {
-  // Adjust app root dir so that test mock services.json is found
-  appEnv.rootDir = mock ? testDir : rootDir;
-}
+const options = { vcap: { services } };
 
 describe("cf", () => {
-  beforeEach(() => {
-    cf._cfEnv = undefined;
-  });
-
-  afterEach(() => {
-    mockServicesFile(false);
-    cf._cfEnv = undefined;
-    delete process.env.VCAP_SERVICES;
-  });
-
   describe("cfEnv()", () => {
-    it("returns an cf env with expected properties", () => {
+    it("returns a cf env with expected properties", () => {
       const cfEnv = cf.cfEnv();
       expect(cfEnv.app).to.deep.equal({});
       expect(cfEnv.services).to.deep.equal({});
@@ -48,146 +61,141 @@ describe("cf", () => {
       expect(cfEnv.getServiceCredsByName).to.be.a("function");
     });
 
-    it("uses VCAP_SERVICES environment variable to populate cf env services if set", () => {
-      process.env.VCAP_SERVICES = vcapServices;
-      const cfEnv = cf.cfEnv();
-      expect(cfEnv.services.discovery).to.have.lengthOf(1);
-    });
-
-    it("uses services.json file to populate cf env services if found", () => {
-      mockServicesFile(true);
-      const cfEnv = cf.cfEnv();
+    it("uses vcap services from options, if specified", () => {
+      const cfEnv = cf.cfEnv(options);
       expect(cfEnv.services.cloudantNoSQLDB).to.have.lengthOf(1);
       expect(cfEnv.services["user-provided"]).to.have.lengthOf(2);
-    });
-
-    it("uses VCAP_SERVICES and ignores services.json if both are found", () => {
-      mockServicesFile(true);
-      process.env.VCAP_SERVICES = vcapServices;
-      const cfEnv = cf.cfEnv();
-      expect(cfEnv.services.discovery).to.have.lengthOf(1);
-      expect(cfEnv.services.cloudantNoSQLDB).to.be.undefined;
-      expect(cfEnv.services["user-provided"]).to.be.undefined;
-    });
-
-    it("returns a cf env with no services when neither VCAP_SERVICES nor services.json is not found", () => {
-      const cfEnv = cf.cfEnv();
-      expect(cfEnv.services).to.be.empty;
     });
   });
 
   describe("getServiceCredsByLabel()", () => {
-    describe("when the cf env has no services", () => {
-      it("throws an error for a service label", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByLabel("cloudantNoSQLDB");
-        };
-        expect(fn).to.throw(/Service not found/);
+    it("returns the credentials for a service by label string", () => {
+      const creds = cf.cfEnv(options).getServiceCredsByLabel("cloudantNoSQLDB");
+      expect(creds).to.deep.equal(cloudantCreds);
+    });
+
+    it("returns credentials for the service whose label matches a specified regexp", () => {
+      const creds = cf.cfEnv(options).getServiceCredsByLabel(/NoSQL/);
+      expect(creds).to.deep.equal(cloudantCreds);
+    });
+
+    it("throws an error for a service label with multiple instances", () => {
+      expect(() => cf.cfEnv(options).getServiceCredsByLabel("user-provided")).to.throw(
+        "Multiple instances of service found"
+      );
+    });
+
+    it("throws an error for a regexp that matches a service label with multiple instances", () => {
+      expect(() => cf.cfEnv(options).getServiceCredsByLabel(/user/)).to.throw(
+        "Multiple instances of service found"
+      );
+    });
+
+    describe("when no service is found for the specified label string", () => {
+      const cfEnv = cf.cfEnv(options);
+
+      it("returns null by default", () => {
+        expect(cfEnv.getServiceCredsByLabel("missing")).to.be.null;
       });
 
-      it("throws an error for a service label regexp", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByLabel(/NoSQL/);
-        };
-        expect(fn).to.throw(/Service not found/);
+      it("throws an error if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByLabel("missing", true)).to.throw("Service not found");
       });
     });
 
-    describe("when the cf env has services", () => {
-      beforeEach(() => {
-        mockServicesFile(true);
+    describe("when no service is found for the specified regexp", () => {
+      const cfEnv = cf.cfEnv(options);
+
+      it("returns null by default", () => {
+        expect(cfEnv.getServiceCredsByLabel(/missing/)).to.be.null;
       });
 
-      afterEach(() => {
-        mockServicesFile(false);
+      it("throws an error if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByLabel(/missing/, true)).to.throw("Service not found");
+      });
+    });
+
+    describe("when no services are defined in the cf env", () => {
+      const cfEnv = cf.cfEnv();
+
+      it("returns null for a label string by default", () => {
+        expect(cfEnv.getServiceCredsByLabel("cloudantNoSQLDB")).to.be.null;
       });
 
-      it("returns credentials for a service label", () => {
-        const creds = cf.cfEnv().getServiceCredsByLabel("cloudantNoSQLDB");
-        expect(creds).to.deep.equal(cloudantCreds);
+      it("returns null for a regexp by default", () => {
+        expect(cfEnv.getServiceCredsByLabel(/NoSQL/)).to.be.null;
       });
 
-      it("returns credentials for a regexp that matches a service label", () => {
-        const creds = cf.cfEnv().getServiceCredsByLabel(/NoSQL/);
-        expect(creds).to.deep.equal(cloudantCreds);
+      it("throws an error for a label string if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByLabel("cloudantNoSQLDB", true)).to.throw(
+          "Service not found"
+        );
       });
 
-      it("throws an error for a non-existent service label", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByLabel("badService");
-        };
-        expect(fn).to.throw(/Service not found/);
-      });
-
-      it("throws an error for a regexp that does not match a service label", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByLabel(/badService/);
-        };
-        expect(fn).to.throw(/Service not found/);
-      });
-
-      it("throws an error for a service label with multiple instances", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByLabel("user-provided");
-        };
-        expect(fn).to.throw(/Multiple instances of service found/);
-      });
-
-      it("throws an error for a regexp that matches a service label with multiple instances", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByLabel(/user/);
-        };
-        expect(fn).to.throw(/Multiple instances of service found/);
+      it("throws an error for a regex if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByLabel(/NoSQL/, true)).to.throw("Service not found");
       });
     });
   });
 
   describe("getServiceCredsByName()", () => {
-    describe("when the cf env has no services", () => {
-      it("throws an error for a service name", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByName("test-cloudantNoSQLDB");
-        };
-        expect(fn).to.throw(/Service not found/);
+    it("returns the credentials for a service by instance name string", () => {
+      const creds = cf.cfEnv(options).getServiceCredsByName("test-cloudantdb");
+      expect(creds).to.deep.equal(cloudantCreds);
+    });
+
+    it("returns the credentials for the service whose name matches a specified regexp", () => {
+      const creds = cf.cfEnv(options).getServiceCredsByName(/cloudantdb/);
+      expect(creds).to.deep.equal(cloudantCreds);
+    });
+
+    it("returns credentials for the first of multiple services with names that match a regexp", () => {
+      const creds = cf.cfEnv(options).getServiceCredsByName(/service/);
+      expect(creds).to.deep.equal(ups1Creds);
+    });
+
+    describe("when no service is found for the specified instance name string", () => {
+      const cfEnv = cf.cfEnv(options);
+
+      it("returns null by default", () => {
+        expect(cfEnv.getServiceCredsByName("missing")).to.be.null;
       });
 
-      it("throws an error for a service name regexp", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByName(/NoSQL/);
-        };
-        expect(fn).to.throw(/Service not found/);
+      it("throws an error if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByName("missing", true)).to.throw("Service not found");
       });
     });
 
-    describe("when the cf env has services", () => {
-      beforeEach(() => {
-        mockServicesFile(true);
+    describe("when no service is found for the specified regexp", () => {
+      const cfEnv = cf.cfEnv(options);
+
+      it("returns null by default", () => {
+        expect(cfEnv.getServiceCredsByName(/missing/)).to.be.null;
       });
 
-      afterEach(() => {
-        mockServicesFile(false);
+      it("throws an error if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByName(/missing/, true)).to.throw("Service not found");
+      });
+    });
+
+    describe("when no services are defined in the cf env", () => {
+      const cfEnv = cf.cfEnv();
+      it("returns null for a name string by default", () => {
+        expect(cfEnv.getServiceCredsByName("test-cloudantdb")).to.be.null;
       });
 
-      it("returns credentials for a service name", () => {
-        const creds = cf.cfEnv().getServiceCredsByName("test-cloudantNoSQLDB");
-        expect(creds).to.deep.equal(cloudantCreds);
+      it("returns null for a regexp by default", () => {
+        expect(cfEnv.getServiceCredsByName(/cloudantdb/)).to.be.null;
       });
 
-      it("returns credentials for a regexp that matches a service name", () => {
-        const creds = cf.cfEnv().getServiceCredsByName(/NoSQL/);
-        expect(creds).to.deep.equal(cloudantCreds);
+      it("throws an error for a name string if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByName("test-cloudantdb", true)).to.throw(
+          "Service not found"
+        );
       });
 
-      it("throws an error for a non-existent service name", () => {
-        const fn = () => {
-          cf.cfEnv().getServiceCredsByName("badService");
-        };
-        expect(fn).to.throw(/Service not found/);
-      });
-
-      it("returns credentials for the first of multiple service names matched by a regexp", () => {
-        const creds = cf.cfEnv().getServiceCredsByName(/service/);
-        expect(creds).to.deep.equal(userProvidedCreds);
+      it("throws an error for a regexp if the service is required", () => {
+        expect(() => cfEnv.getServiceCredsByName(/cloudantdb/, true)).to.throw("Service not found");
       });
     });
   });
