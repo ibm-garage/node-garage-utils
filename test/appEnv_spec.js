@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const path = require("path");
 const { appEnv } = require("../index");
 
-describe("app", () => {
+describe("appEnv", () => {
   describe("_rootDir()", () => {
     let origAppDir;
 
@@ -21,13 +21,6 @@ describe("app", () => {
     it("returns the expected root when appEnv tweaked to simulate installation under node_modules", () => {
       const rootDir = path.sep + path.join("home", "myapp");
       const dir = path.join(rootDir, "node_modules", "sub", "node_modules", "lib");
-      appEnv._dir = dir;
-      expect(appEnv._rootDir()).to.equal(rootDir);
-    });
-
-    it("returns the expected root when appEnv tweaked to simulate installation under user_modules", () => {
-      const rootDir = path.sep + path.join("home", "myapp");
-      const dir = path.join(rootDir, "user_modules", "lib");
       appEnv._dir = dir;
       expect(appEnv._rootDir()).to.equal(rootDir);
     });
@@ -60,51 +53,86 @@ describe("app", () => {
   });
 
   describe("_env()", () => {
+    let origNodeEnv;
+
     beforeEach(() => {
-      delete process.env.GAPP_ENV;
+      origNodeEnv = process.env.NODE_ENV;
     });
 
-    after(() => {
-      delete process.env.GAPP_ENV;
+    afterEach(() => {
+      if (origNodeEnv == null) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = origNodeEnv;
+      }
     });
 
-    it("returns the value of the GAPP_ENV environment variable if set", () => {
-      process.env.GAPP_ENV = "custom";
-      expect(appEnv._env()).to.equal("custom");
+    it("returns 'test' in an unmodified testing environment", () => {
+      expect(appEnv._env()).to.equal("test");
     });
 
-    describe("when the GAPP_ENV environment variable is not set", () => {
-      it("returns 'unit' in an unmodified unit testing environment, where mocha is the main module", () => {
-        expect(appEnv._env()).to.equal("unit");
+    describe("when the NODE_ENV environment variable is set", () => {
+      it("returns a standard value of NODE_ENV", () => {
+        process.env.NODE_ENV = "production";
+        expect(appEnv._env()).to.equal("production");
       });
 
-      describe("when the main module is tweaked to simulate a non-testing environment", () => {
-        let origNodeEnv;
+      it("returns a custom value of NODE_ENV", () => {
+        process.env.NODE_ENV = "custom";
+        expect(appEnv._env()).to.equal("custom");
+      });
 
-        beforeEach(() => {
-          origNodeEnv = process.env.NODE_ENV;
-          appEnv.mainFile = path.join(appEnv._rootDir(), "app.js");
-        });
+      it("ignores an empty NODE_ENV value", () => {
+        process.env.NODE_ENV = "";
+        expect(appEnv._env()).to.equal("test");
+      });
+    });
 
-        afterEach(() => {
-          process.env.NODE_ENV = origNodeEnv;
-          appEnv.reset();
-        });
+    describe("when NODE_ENV is not set", () => {
+      beforeEach(() => {
+        delete process.env.NODE_ENV;
+      });
 
-        it("returns 'dev' if the NODE_ENV environment variable is not set", () => {
-          delete process.env.NODE_ENV;
-          expect(appEnv._env()).to.equal("dev");
-        });
+      afterEach(() => {
+        appEnv.reset();
+      });
 
-        it("returns 'prod' if NODE_ENV is set to 'production'", () => {
-          process.env.NODE_ENV = "production";
-          expect(appEnv._env()).to.equal("prod");
-        });
+      it("returns 'test' if the last segment of the main module is _mocha", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "node_modules", "mocha", "bin", "_mocha");
+        expect(appEnv._env()).to.equal("test");
+      });
 
-        it("returns 'dev' if NODE_ENV is set to anything else", () => {
-          process.env.NODE_ENV = "prod";
-          expect(appEnv._env()).to.equal("dev");
-        });
+      it("returns undefined if the last segment of the main module ends with, but is not, _mocha", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "node_modules", "mocha", "bin", "not_mocha");
+        expect(appEnv._env()).to.be.undefined;
+      });
+
+      it("returns 'script' if the main module is in a typical app script location", () => {
+        appEnv.rootDir = path.join("home", "app");
+        appEnv.mainFile = path.join(appEnv.rootDir, "scripts", "initdb");
+        expect(appEnv._env()).to.equal("script");
+      });
+
+      it("returns 'script' if the main module is in a typical app binary location", () => {
+        appEnv.rootDir = path.join("home", "app");
+        appEnv.mainFile = path.join(appEnv.rootDir, "bin", "initdb");
+        expect(appEnv._env()).to.equal("script");
+      });
+
+      it("returns 'script' if the main module is a binary in this module", () => {
+        appEnv.mainFile = path.join(appEnv.rootDir, "bin", "cfutil.js");
+        expect(appEnv._env()).to.equal("script");
+      });
+
+      it("returns undefined if the main module is in an atypical bin directory", () => {
+        appEnv.mainFile = path.join("home", "app", "bin", "initdb");
+        expect(appEnv._env()).to.be.undefined;
+      });
+
+      it("returns undefined if the main module is something else", () => {
+        appEnv.rootDir = path.join("home", "app");
+        appEnv.mainFile = path.join(appEnv.rootDir, "server", "server.js");
+        expect(appEnv._env()).to.be.undefined;
       });
     });
   });
@@ -151,140 +179,51 @@ describe("app", () => {
     });
   });
 
-  describe("isSpec()", () => {
-    it("returns true in an unmodified unit testing environment, where mocha is the main module", () => {
-      expect(appEnv.isSpec()).to.be.true;
-    });
-
-    describe("when the main module is tweaked to simulate other environments", () => {
-      afterEach(() => {
-        appEnv.reset();
-      });
-
-      it("returns true when the last segment of the main module is _mocha", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "_mocha");
-        expect(appEnv.isSpec()).to.be.true;
-      });
-
-      it("returns false when the last segment of the main module ends with, but is not, _mocha", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "not_mocha");
-        expect(appEnv.isSpec()).to.be.false;
-      });
-
-      it("returns true when the main module ends with .spec.js", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module.spec.js");
-        expect(appEnv.isSpec()).to.be.true;
-      });
-
-      it("returns true when the main module ends with _spec.js", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module_spec.js");
-        expect(appEnv.isSpec()).to.be.true;
-      });
-
-      it("returns false when the main module ends with -spec.js", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module-spec.js");
-        expect(appEnv.isSpec()).to.be.false;
-      });
-
-      it("returns true when the main module ends with .test.js", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module.test.js");
-        expect(appEnv.isSpec()).to.be.true;
-      });
-
-      it("returns true when the main module ends with _test.js", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module_test.js");
-        expect(appEnv.isSpec()).to.be.true;
-      });
-
-      it("returns false when the main module ends with -test.js", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "/test/module-test.js");
-        expect(appEnv.isSpec()).to.be.false;
-      });
-
-      it("returns false for other non-testing environments", () => {
-        appEnv.mainFile = path.join(appEnv.rootDir, "app.js");
-        expect(appEnv.isSpec()).to.be.false;
-      });
-    });
-  });
-
-  describe("isScript()", () => {
-    afterEach(() => {
-      appEnv.reset();
-    });
-
-    it("returns false in an unmodified unit testing environment, where mocha is the main module", () => {
-      expect(appEnv.isScript()).to.be.false;
-    });
-
-    it("returns true when the main module is tweaked to simulate an app script", () => {
-      appEnv.rootDir = path.join("home", "app");
-      appEnv.mainFile = path.join(appEnv.rootDir, "scripts", "initdb");
-      expect(appEnv.isScript()).to.be.true;
-    });
-
-    it("returns true when the main module is tweaked to simulate an app binary", () => {
-      appEnv.rootDir = path.join("home", "app");
-      appEnv.mainFile = path.join(appEnv.rootDir, "bin", "initdb");
-      expect(appEnv.isScript()).to.be.true;
-    });
-
-    it("returns true when the main module is tweaked to simulate a module binary", () => {
-      appEnv.mainFile = path.join(appEnv.rootDir, "bin", "secrets");
-      expect(appEnv.isScript()).to.be.true;
-    });
-
-    it("returns false when the main module is anything else", () => {
-      appEnv.rootDir = path.join("home", "app");
-      appEnv.mainFile = path.join(appEnv.rootDir, "server", "server.js");
-      expect(appEnv.isScript()).to.be.false;
-    });
-  });
-
-  describe("the boolean env functions...", () => {
+  describe("the boolean env functions:", () => {
     after(() => {
       appEnv.reset();
     });
 
-    describe("when env is 'unit'", () => {
+    describe("when env is 'development'", () => {
       before(() => {
-        appEnv.env = "unit";
+        appEnv.env = "development";
       });
 
-      it("isUnit() returns true", () => {
-        expect(appEnv.isUnit()).to.be.true;
+      it("isDev() returns true", () => {
+        expect(appEnv.isDev()).to.be.true;
+      });
+
+      it("isProd() returns false", () => {
+        expect(appEnv.isProd()).to.be.false;
+      });
+
+      it("isTest() returns false", () => {
+        expect(appEnv.isTest()).to.be.false;
+      });
+
+      it("isScript() returns false", () => {
+        expect(appEnv.isScript()).to.be.false;
+      });
+    });
+
+    describe("when env is 'production'", () => {
+      before(() => {
+        appEnv.env = "production";
       });
       it("isDev() returns false", () => {
         expect(appEnv.isDev()).to.be.false;
       });
 
-      it("isTest() returns false", () => {
-        expect(appEnv.isTest()).to.be.false;
-      });
-
-      it("isProd() returns false", () => {
-        expect(appEnv.isProd()).to.be.false;
-      });
-    });
-
-    describe("when env is 'dev'", () => {
-      before(() => {
-        appEnv.env = "dev";
-      });
-
-      it("isUnit() returns false", () => {
-        expect(appEnv.isUnit()).to.be.false;
-      });
-      it("isDev() returns true", () => {
-        expect(appEnv.isDev()).to.be.true;
+      it("isProd() returns true", () => {
+        expect(appEnv.isProd()).to.be.true;
       });
 
       it("isTest() returns false", () => {
         expect(appEnv.isTest()).to.be.false;
       });
 
-      it("isProd() returns false", () => {
-        expect(appEnv.isProd()).to.be.false;
+      it("isScript() returns false", () => {
+        expect(appEnv.isScript()).to.be.false;
       });
     });
 
@@ -293,40 +232,42 @@ describe("app", () => {
         appEnv.env = "test";
       });
 
-      it("isUnit() returns false", () => {
-        expect(appEnv.isUnit()).to.be.false;
-      });
       it("isDev() returns false", () => {
         expect(appEnv.isDev()).to.be.false;
+      });
+
+      it("isProd() returns false", () => {
+        expect(appEnv.isProd()).to.be.false;
       });
 
       it("isTest() returns true", () => {
         expect(appEnv.isTest()).to.be.true;
       });
 
-      it("isProd() returns false", () => {
-        expect(appEnv.isProd()).to.be.false;
+      it("isScript() returns false", () => {
+        expect(appEnv.isScript()).to.be.false;
       });
     });
 
-    describe("when env is 'prod'", () => {
+    describe("when env is 'script'", () => {
       before(() => {
-        appEnv.env = "prod";
+        appEnv.env = "script";
       });
 
-      it("isUnit() returns false", () => {
-        expect(appEnv.isUnit()).to.be.false;
-      });
       it("isDev() returns false", () => {
         expect(appEnv.isDev()).to.be.false;
+      });
+
+      it("isProd() returns false", () => {
+        expect(appEnv.isProd()).to.be.false;
       });
 
       it("isTest() returns false", () => {
         expect(appEnv.isTest()).to.be.false;
       });
 
-      it("isProd() returns true", () => {
-        expect(appEnv.isProd()).to.be.true;
+      it("isScript() returns true", () => {
+        expect(appEnv.isScript()).to.be.true;
       });
     });
 
@@ -335,19 +276,20 @@ describe("app", () => {
         appEnv.env = "custom";
       });
 
-      it("isUnit() returns false", () => {
-        expect(appEnv.isUnit()).to.be.false;
-      });
       it("isDev() returns false", () => {
         expect(appEnv.isDev()).to.be.false;
+      });
+
+      it("isProd() returns false", () => {
+        expect(appEnv.isProd()).to.be.false;
       });
 
       it("isTest() returns false", () => {
         expect(appEnv.isTest()).to.be.false;
       });
 
-      it("isProd() returns false", () => {
-        expect(appEnv.isProd()).to.be.false;
+      it("isScript() returns false", () => {
+        expect(appEnv.isScript()).to.be.false;
       });
     });
   });

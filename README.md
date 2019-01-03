@@ -44,58 +44,50 @@ included.
 The version of the application, as read from the `package.json` file in the application's root
 directory (undefined if there is no version or no `package.json` file at all).
 
-#### appEnv.isSpec()
-
-Returns true when running under Mocha or under Jest with conventional filenames (`*.spec.js`,
-`*_spec.js`, `*.test.js`, or `*_test.js`), false otherwise.
-
-#### appEnv.isScript()
-
-Returns true when running as a script or binary (in `scripts` or `bin`, under the application root
-directory or within the garage-utils module).
-
 #### appEnv.env
 
-The running environment of the application. This can be one of the following four built-in values,
-or any desired custom value:
+The running environment of the application. If the `NODE_ENV` environment variable is set, this
+takes its value directly. The following values are common:
 
-- "unit" for unit testing
-- "dev" for development
-- "test" for integration testing and deployment to test environments
-- "prod" for production deployment.
+- "development" for development environments
+- "production" for production deployment
+- "test" for automated testing
+- "script" for CLI or interactive scripts.
 
-Though the NODE_ENV environment variable is a handy mechanism, it's not sufficient to account for
-all the key environments. In particular, there's no accounting for a test environment, which should
-serve bundled client code but produce more verbose logging and error messages on the server.
+For other non-production environments, such as QA or staging, it is usual simply to leave `NODE_ENV`
+unset and treat them as the default. Other, custom values are allowed, as well.
 
-By default, the utility detects when running under Mocha (i.e. when `appEnv.isSpec()` returns true)
-and reports "unit" in that case. Otherwise, the value is either "prod" or "dev", depending on
-whether the NODE_ENV environment variable is "production" or something else (or undefined). This
-aligns with the way Express interprets that environment variable.
+If `NODE_ENV` is not set (or is set to an empty value), then `appEnv.env` is usually left undefined,
+except when a value is automatically assigned in two special circumstances:
 
-It is also possible to set a GAPP_ENV environment variable to one of "unit", "dev", "test", or
-"prod", or to any custom value, to override these defaults. Note that setting GAPP_ENV is the only
-way to get a test environment. You should definitely do this when using Mocha to run integration
-tests; otherwise, they will be mistaken for unit tests.
+1.  "test" when running under Mocha (i.e. when `appEnv.mainFile`'s last segment is `_mocha`).
 
-The following four functions are also provided to more easily test for a particular environment,
-avoiding the need for string comparisons.
+1.  "script" when running as a script or binary (i.e. when the path of `appEnv.mainFile` is
+    `scripts` or `bin`, under the application root directory or within the garage-utils module).
 
-#### appEnv.isUnit()
+[Jest](https://jestjs.io/en/) automatically sets `NODE_ENV` to "test", and the special handling for
+[Mocha](https://mochajs.org/) attempts to give a similar experience in that testing environment.
+This is used by the `logger` API in garage-utils to automatically configure itself for testing in a
+Mocha environment. However, other tools. such as [config](https://www.npmjs.com/package/config),
+check the value of `NODE_ENV` directly, and they will not see a value of "test" under Mocha unless you set the environment variable yourself.
 
-Returns true when `appEnv.env` is "unit", false otherwise.
+The following four functions are also provided to easily test for the above common environments.
 
 #### appEnv.isDev()
 
-Returns true when `appEnv.env` is "dev", false otherwise.
-
-#### appEnv.isTest()
-
-Returns true when `appEnv.env` is "test", false otherwise.
+Returns true if `appEnv.env` is "development", false otherwise.
 
 #### appEnv.isProd()
 
-Returns true when `appEnv.env` is "prod", false otherwise.
+Returns true if `appEnv.env` is "production", false otherwise.
+
+#### appEnv.isTest()
+
+Returns true if `appEnv.env` is "test", false otherwise.
+
+#### appEnv.isScript()
+
+Returns true if `appEnv.env` is "script", false otherwise.
 
 #### appEnv.reset()
 

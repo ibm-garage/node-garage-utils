@@ -66,6 +66,7 @@ describe("logger", () => {
 
       beforeEach(() => {
         appEnv.mainFile = path.join(appEnv.rootDir, "bin", "secrets");
+        appEnv.env = "script";
         logger_ = logger._createLogger();
       });
 
@@ -96,6 +97,7 @@ describe("logger", () => {
       beforeEach(() => {
         appEnv.rootDir = path.join("home", "app");
         appEnv.mainFile = path.join(appEnv.rootDir, "server", "server.js");
+        appEnv.env = "production";
         logger_ = logger._createLogger();
       });
 
@@ -143,6 +145,7 @@ describe("logger", () => {
         process.env.LOG_LEVEL = "error";
         appEnv.rootDir = path.join("home", "app");
         appEnv.mainFile = path.join(appEnv.rootDir, "server", "server.js");
+        appEnv.env = "development";
         const logger_ = logger._createLogger();
         expect(logger_._level).to.equal(50);
       });
@@ -151,6 +154,7 @@ describe("logger", () => {
         process.env.LOG_LEVEL = "invalid";
         appEnv.rootDir = path.join("home", "app");
         appEnv.mainFile = path.join(appEnv.rootDir, "server", "server.js");
+        appEnv.env = "development";
         const logger_ = logger._createLogger();
         expect(logger_._level).to.equal(20);
       });

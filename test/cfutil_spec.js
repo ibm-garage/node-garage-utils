@@ -15,7 +15,7 @@ const expectedServices = {
 };
 
 const expectedUserProvided = {
-  NODE_ENV: " test",
+  NODE_ENV: " stage",
   GREETING: " Hello, world!",
   EMPTY: ""
 };
@@ -47,7 +47,7 @@ System-Provided:
 }
 
 User-Provided:
-NODE_ENV: test
+NODE_ENV: stage
 GREETING: Hello, world!
 EMPTY:
 
