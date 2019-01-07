@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v3.3.0...v4.0.0) (2019-01-07)
+
+
+### Features
+
+* **appEnv:** simplify env value computation and isDev(), isProd(), etc. functions, to more closely align with common Node conventions and work better with other tools ([a4f5b2d](https://github.com/ibm-garage/node-garage-utils/commit/a4f5b2d))
+* **cf:** remove automatic services.json parsing in cfEnv(), make getServiceCredsByLabel() and getServiceCredsByName() not fail-fast by default ([421ecdd](https://github.com/ibm-garage/node-garage-utils/commit/421ecdd))
+* **cfutil:** add logs command for Bunyan-friendly log streaming ([ca1e706](https://github.com/ibm-garage/node-garage-utils/commit/ca1e706))
+* **cfutil:** new CLI utility for Cloud Foundry projects, with env command ([2b34f10](https://github.com/ibm-garage/node-garage-utils/commit/2b34f10))
+
+
+### BREAKING CHANGES
+
+* **appEnv:** appEnv.env special values are changed: "dev" -> "development", "prod" -> "production", "test" for all automated testing (replacing "unit" and some uses of "test"), "script" added; isSpec() and isUnit() functions are removed; GAPP_ENV is no longer used
+
+Set NODE_ENV directly, instead of GAPP_ENV (which is now ignored). Use isTest() instead of isSpec() to detect any automated testing environment. Instead of trying to distinguish between unit and integration tests via
+appEnv, simply set VCAP_SERVICES (for CF) or secrets (for Kube) differently.
+* **cf:** cfEnv() no longer provides special handling for services when running in the dev environment; getServiceCredsByLabel() and getServiceCredsByName() now return null by default when no matching service is found
+
+Developers must take care to set a VCAP_SERVICES environment variable in the dev environment or use the vcap or vcapFile option on cfEnv() to explicitly specify services. The former approach is recommended, and the new cfutil env command can help by generating a local artifact from an actual CF environment and a script that reads it.
+
+To maintain the old error-throwing behavior of getServiceCredsByLabel() or getServiceCredsByName(), simply pass true as a second argument. Returning null by default allows for simpler client code in cases where the absence of a service can be tolerated (no try/catch required).
+
+
+
 <a name="3.3.0"></a>
 # [3.3.0](https://github.com/ibm-garage/node-garage-utils/compare/v3.2.0...v3.3.0) (2018-08-28)
 
