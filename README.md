@@ -94,6 +94,140 @@ Returns true if `appEnv.env` is "script", false otherwise.
 Resets `appEnv.rootDir`, `appEnv.mainFile`, and `appEnv.env` to their computed values, if any of
 them have been changed.
 
+### Cloud Environment
+
+```
+const { cloudEnv } = require("garage-utils");
+```
+
+Provides information about the cloud environment in which the application is running. This API
+functions as a common abstraction for Cloud Foundry and Kubernetes environments in IBM Cloud. In
+Kubernetes, you need to follow some containerization and deployment conventions to fully support
+it.
+
+This API is partially duplicative of [ibm-cloud-env](https://www.npmjs.com/package/ibm-cloud-env)
+for retrieving service credentials, but it focuses on three specific cases: Cloud Foundry services
+identified by label, Cloud Foundry services identified by name, and Kubernetes-bound services
+exposed as environment variables. This limited scope results in an API that's simpler and safer to
+use.
+
+#### cloudEnv.platform
+
+An identifier for the cloud platform. One of:
+
+- "cf" for Cloud Foundry
+- "kube" for Kubernetes (including OpenShift)
+- undefined for neither.
+
+The platform is identified by looking for an environment variable that is automatically set in that
+environment (`VCAP_APPLICATION` for Cloud Foundry, `KUBERNETES_SERVICE_HOST` for Kubernetes).
+
+#### cloudEnv.port
+
+The port on which the application should listen for incoming connections. Usually, the cloud
+platform handles TLS termination, and so the application need only handle HTTP connections on a
+single port. The platform directs traffic to a particular port in the application's environment,
+and sets the `PORT` environment variable to inform the application of what port that is. If this
+environment variable is not set, `port` is 3000 by default.
+
+This happens automatically on Cloud Foundry. On Kubernetes, you decide what port (or ports) from
+the container to expose (in the `Dockerfile` and the Deployment/DeploymentConfig spec) and how to
+map it to a service port (in the Service spec). You can either expose the default port 3000 or, if
+you wish to expose a custom port, set a `PORT` environment variable to match in the
+Deployment/DeploymentConfig.
+
+#### cloudEnv.isCf()
+
+Returns true if `cloudEnv.platform` is "cf", false otherwise.
+
+#### cloudEnv.isKube()
+
+Returns true if `cloudEnv.platform` is "kube", false otherwise.
+
+#### cloudEnv.serviceCreds(specs, required)
+
+Returns the credentials object of a service matching a given spec, or one of several given specs.
+In its simplest form, a spec can be a string representing a name. When more flexibility is needed,
+it can be specified as an object with particular properties.
+
+On Cloud Foundry, services bound to the application are exposed to it via a single `VCAP_SERVICES`
+environment variable. If that environment variable is defined, `serviceCreds()` attempts to locate
+services within it based on the name and/or label from the spec. For example, to retrieve the
+credentials for service named "myservice", regardless of its type (including user-provided):
+
+```
+const creds = cloudEnv.serviceCreds("myservice");
+```
+
+To retrieve the credentials for a single Cloudant service bound to the application:
+
+```
+const creds = cloudEnv.serviceCreds({ label: "cloudantNoSQLDB" });
+```
+
+Note that if multiple services of the specified label (i.e. type) are bound to the application, an
+error will be thrown. To specify both the label and name:
+
+```
+const creds = cloudEnv.serviceCreds({ label: "cloudantNoSQLDB", name: "mycloudant" });
+```
+
+On Kubernetes or, more generally, in the absence of a `VCAP_SERVICES` environment variable,
+`serviceCreds()` simply looks for the named environment variable and parses it as JSON to obtain
+a credentials object. An error is thrown if the named environment variable is defined but its value
+is not a JSON object.
+
+On IBM Cloud, you can [bind](https://cloud.ibm.com/docs/containers?topic=containers-service-binding)
+a service to a namespace in a Kubernetes cluster. This automatically defines a secret in that
+namespace with the credentials object (keyed by "binding"). In this case, you can simply define an
+environment variable with value from that secret in the Deployment/DeploymentConfig spec.
+For example, for a bound service named "mycloudant":
+
+```
+env:
+- name: CLOUDANT_CREDS
+  valueFrom:
+    secretKeyRef:
+      name: binding-mycloudant
+      key: binding
+```
+
+Then, you can retrieve the credentials like this:
+
+```
+const creds = cloudEnv.serviceCreds("CLOUDANT_CREDS");
+```
+
+In other Kubernetes environments, or for external services or services that are not bound to the
+cluster, you will need to manually define the secret with the credentials as a JSON object, as
+well. There are other ways to capture credentials in secrets and expose them within containers
+in Kubernetes, but they are not explicitly supported by this utility.
+
+You can explicitly request credentials from an environment variable, even in a Cloud Foundry
+environment, by including a `type` of "env" in the spec:
+
+```
+const creds = cloudEnv.serviceCreds({ type: "env", name: "CLOUDANT_CREDS" });
+```
+
+You can also explicitly specify a `type` of "cf", which will cause the spec to be ignored in a
+non-CF environment.
+
+You can use this utility to make a single application flexible, allowing it to deploy in both Cloud
+Foundry and Kubernetes environments -- though this is more useful for starters and demos than for
+real applications. To do so, simply list multiple specs in an array:
+
+```
+const creds = cloudEnv.serviceCreds([{ label: "cloudantNoSQLDB" }, "CLOUDANT_CREDS"]);
+```
+
+As long as only one spec is satified in the environment, the correct credentials will be returned.
+If more than one spec is satisfied, an error will be thrown instead. This is to help prevent
+accidentally sending credentials to the wrong service in an ambiguously configured environment.
+
+If no service is found that satisfies the given spec (or specs), this function returns undefined by
+default, or throws an error if `required` is true.
+
 ### Time
 
 ```
@@ -340,6 +474,11 @@ const { cf } = require("garage-utils");
 Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse and interpret
 Cloud Foundry-provided environment variables, with additional functions for querying service
 credentials.
+
+> **Deprecated**: `cf` was deprecated in version 4.1.0 of garage-utils, and will be removed in a
+> future version. You should adopt the new `cloudEnv` API, which works in both Cloud Foundry and
+> Kubernetes environments, instead. If your Cloud Foundry app has specific needs that it does not
+> address, you can use [cfenv](https://github.com/cloudfoundry-community/node-cfenv) directly.
 
 #### cf.cfEnv(options)
 

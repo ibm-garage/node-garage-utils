@@ -10,7 +10,7 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --verbose",
     "test:watch": "jest --watchAll",
     "test:coverage": "jest --coverage",
     "coverage": "cat coverage/lcov.info | coveralls",
