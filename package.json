@@ -34,16 +34,16 @@
     "bunyan": "^1.8.12",
     "bunyan-prettystream-circularsafe": "^0.3.1",
     "cfenv": "^1.2.2",
-    "commander": "^2.19.0",
+    "commander": "^3.0.0",
     "eol": "^0.9.1",
     "moment": "^2.24.0"
   },
   "devDependencies": {
-    "coveralls": "^3.0.3",
-    "eslint": "^5.15.3",
-    "eslint-plugin-prettier": "^3.0.1",
-    "jest": "^24.5.0",
-    "prettier": "^1.16.4",
-    "standard-version": "^5.0.2"
+    "coveralls": "^3.0.6",
+    "eslint": "^6.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "standard-version": "^7.0.0"
   }
 }
