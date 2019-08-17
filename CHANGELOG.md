@@ -1,6 +1,14 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [4.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.0.2...v4.1.0) (2019-08-17)
+
+
+### Features
+
+* **cloudEnv:** new cloudEnv abstraction for information about the CF or Kubernetes environment ([6d2dc44](https://github.com/ibm-garage/node-garage-utils/commit/6d2dc44))
+* **cloudEnv:** new serviceCreds() to obtain service credentials from VCAP_SERVICES (in CF) or a named environment variable (in Kubernetes) ([5eadf08](https://github.com/ibm-garage/node-garage-utils/commit/5eadf08))
 
 ## [4.0.2](https://github.com/ibm-garage/node-garage-utils/compare/v4.0.1...v4.0.2) (2019-03-27)
 
