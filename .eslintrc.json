@@ -8,8 +8,7 @@
   "parserOptions": {
     "ecmaVersion": 2017
   },
-  "plugins": ["prettier"],
-  "extends": "eslint:recommended",
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "rules": {
     "no-console": "off",
     "no-unused-vars": ["error", { "vars": "all", "args": "none" }],
@@ -18,9 +17,6 @@
     "no-path-concat": "error",
     "no-var": "error",
     "no-process-exit": "off",
-    "linebreak-style": ["error", "unix"],
-    "no-extra-semi": "off",
-    "no-mixed-spaces-and-tabs": "off",
-    "prettier/prettier": "error"
+    "linebreak-style": ["error", "unix"]
   }
 }
