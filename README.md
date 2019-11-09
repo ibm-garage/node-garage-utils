@@ -324,12 +324,13 @@ const { logger } = require("garage-utils");
 
 Logging support based on [Bunyan](https://github.com/trentm/node-bunyan). Accessing `logger` yields
 a Bunyan logger that is automatically preconfigured for the current environment (testing, scripting,
-or application runtime) and enhanced with a couple of extra functions.
+development, or another application runtime environment) and enhanced with a couple of extra
+functions.
 
 You can use the logging functions described here for all error, status, and debugging information,
 and it will be handled appropriately for the context in which the code runs.
 
-#### Levels
+#### Levels & formats
 
 | Level | Value | Description                                                            |
 | ----- | ----- | ---------------------------------------------------------------------- |
@@ -341,21 +342,27 @@ and it will be handled appropriately for the context in which the code runs.
 | fatal | 60    | Fatal errors that result in the application being terminated.          |
 
 By default, applications in all environments log to stdout at level "info" and above. Logged entries
-are emitted as single-line JSON objects for easy collection, indexing, and searching. If you wish to
-watch logs from a single instance in real time (such as when running locally during development),
-you can pipe stdout to the `bunyan` [CLI tool](https://github.com/trentm/node-bunyan#cli-usage) for filtering and pretty-printing.
-
-Automated tests (specs) log at level "trace" and above to a `test.log` file, plus levels "warn" and
-above to stderr. This prevents expected log output from messing up the test reports. Scripts log to
-stderr at level "warn" and above by default.
-
-For specs and scripts, logging to stderr is internally pretty-printed via the special
+are emitted as single-line JSON objects by default for easy collection, indexing, and searching.
+In development, logs are automatically pretty-printed, via the special
 [bunyan-prettystream-circularsafe](https://www.npmjs.com/package/bunyan-prettystream-circularsafe)
-stream implementation.
+stream implementation, for easier human consumption in real time.
+
+Automated tests log at level "trace" and above to a `test.log` file, plus levels "warn" and above
+to stderr. This prevents expected log output from messing up the test reports. Scripts log to
+stderr at level "warn" and above by default. For both specs and scripts, logging to stderr is
+automatically pretty-printed, as well.
 
 In all cases, the default logging level can be overridden via a `LOG_LEVEL` environment variable
 and set dynamically by the application using Bunyan's `logger.level()` and `logger.levels()`
 functions.
+
+The default formatting can be overridden by setting the `LOG_FORMAT` environment variable to "json"
+"pretty", or "script", but do not use any formatting other than "json" in production environments
+(a warning will be logged if you do).
+
+You can also use the `bunyan` [CLI tool](https://github.com/trentm/node-bunyan#cli-usage) for
+filtering and pretty-printing JSON logs, as an alternative to the formatting provided by this
+library.
 
 #### logger.level([level])
 
