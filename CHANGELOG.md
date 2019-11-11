@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.1.0...v4.2.0) (2019-11-11)
+
+
+### Features
+
+* **logger:** support pretty printing application logs according to LOG_FORMAT (and by default in development) ([f0a3d80](https://github.com/ibm-garage/node-garage-utils/commit/f0a3d80763aa545da8b1cbb8c529e9bdbe9a41a5))
+
 ## [4.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.0.2...v4.1.0) (2019-08-17)
 
 
