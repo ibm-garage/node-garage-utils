@@ -542,7 +542,7 @@ $ npx cfutil env -h
 $ npx cfutil logs -h
 ```
 
-### env
+#### env
 
 Saves information about the enviroment of a Cloud Foundry app to a file that can be used to
 replicate (or partially replicate) that environment when running locally.
@@ -566,16 +566,14 @@ a tiny `env.sh` script that will consume it at run time. For example, you might 
 script like this:
 
 ```
-"start:local": ". env.sh && node server/server.js | bunyan",
+"start:local": ". env.sh && node server/server.js",
 ```
 
 Here, sourcing `env.sh` adds the variables defined in `.env` or `services.json` to the environment.
-Piping to `bunyan` is unrelated but recommended, assuming you are using the Bunyan-based `logger`
-API.
 
 Use the `-h` option to see all options supported by the `env` command.
 
-## logs
+#### logs
 
 Tails or shows recent logs for a Cloud Foundry app, trimming the content added by Loggregator from
 JSON messages to allow for formatting by the Bunyan CLI. This command takes the place of `cf logs`
