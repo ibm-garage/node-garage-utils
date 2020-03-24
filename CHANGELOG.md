@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.2.0...v4.3.0) (2020-03-24)
+
+
+### Features
+
+* **appEnv:** handle more environments, finding rootDir from entry point when installed in an external node_modules ([c625680](https://github.com/ibm-garage/node-garage-utils/commit/c625680b5530d0dcbe319a937267a6e985047622))
+
 ## [4.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.1.0...v4.2.0) (2019-11-11)
 
 
