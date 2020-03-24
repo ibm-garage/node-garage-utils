@@ -28,7 +28,7 @@ const { appEnv } = require("garage-utils");
 
 Provides information about the running application. In most cases, you should not change these
 values, though doing so can be useful occasionally to simulate a different environment for testing
-purposes. In these cases, calling reset() returns them all to their default values.
+purposes. In these cases, calling `reset()` returns them all to their default values.
 
 #### appEnv.rootDir
 
