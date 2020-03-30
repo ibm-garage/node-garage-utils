@@ -4,10 +4,23 @@
 
 # Garage Utilities for Node
 
-This module provides common APIs and CLI utilities for Node.js/Express applications at the IBM
-Cloud Garage.
+This module provides common APIs and CLI utilities for Node.js/Express applications at the IBM Garage.
 
 It requires Node.js 10.13.0 (LTS Dubnium) or later.
+
+## Contents
+
+- [Installation](#installation)
+- [APIs](#apis)
+  - [Application Environment](#application-environment)
+  - [Cloud Environment](#cloud-environment)
+  - [Time](#time)
+  - [Errors](#errors)
+  - [Logger](#logger)
+  - [Cloud Foundry](#cloud-foundry)
+- [CLI Utilities](#cli-utilities)
+  - [CF Util](#cf-util)
+- [License](#license)
 
 ## Installation
 
