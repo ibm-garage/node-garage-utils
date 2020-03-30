@@ -5,18 +5,18 @@ const expectedServices = {
     {
       credentials: {
         password: "passw0rd",
-        username: "user"
+        username: "user",
       },
       label: "service1",
-      name: "my-service1"
-    }
-  ]
+      name: "my-service1",
+    },
+  ],
 };
 
 const expectedUserProvided = {
   NODE_ENV: " stage",
   GREETING: " Hello, world!",
-  EMPTY: ""
+  EMPTY: "",
 };
 
 const envOutput = `Getting env variables for app my-app in org my-org / space my-space as user@ibm.com...

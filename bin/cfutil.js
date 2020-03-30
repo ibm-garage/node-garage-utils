@@ -56,12 +56,12 @@ function withCause(err, cause) {
 
 function checkCf() {
   return execFile("cf", ["-v"]).then(
-    result => {
+    (result) => {
       if (!result.stdout.startsWith("cf version")) {
         throw new Error("Invalid cf executable: check installation and path");
       }
     },
-    err => {
+    (err) => {
       throw withCause(new Error("Unable to run cf executable: check installation and path"), err);
     }
   );
@@ -81,7 +81,7 @@ async function env(app, options = {}) {
     json = false,
     user = false,
     script = false,
-    filename = json ? "services.json" : ".env"
+    filename = json ? "services.json" : ".env",
   } = options;
 
   await checkCf();
@@ -130,7 +130,7 @@ function parseUserProvided(envOutput) {
     if (!match) {
       throw new Error("Invalid cf env output: cannot parse user-provided environment variables");
     }
-    match[1].split("\n").forEach(line => {
+    match[1].split("\n").forEach((line) => {
       const [name, val] = line.split(":");
       if (name) {
         vars[name] = val;
@@ -156,7 +156,7 @@ function envScript(filename, json) {
     `filename="${filenameWithDefault}"`,
     "set -a",
     json ? 'VCAP_SERVICES=$(cat "$filename")' : '. "$filename"',
-    "set +a"
+    "set +a",
   ];
   return lines.join(nl) + nl;
 }
@@ -173,8 +173,8 @@ async function logs(app, { recent = false, appOnly = false, jsonOnly = false } =
 
   const cf = spawn("cf", args, { stdio: [process.stdin, "pipe", process.stderr] });
   cf.on("exit", process.exit);
-  cf.stdout.on("data", data => {
-    splitLines(data).forEach(line => {
+  cf.stdout.on("data", (data) => {
+    splitLines(data).forEach((line) => {
       if (lineCount++ < 2) {
         console.log(line);
       } else {

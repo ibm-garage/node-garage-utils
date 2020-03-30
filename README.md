@@ -7,16 +7,13 @@
 This module provides common APIs and CLI utilities for Node.js/Express applications at the IBM
 Cloud Garage.
 
-It requires Node.js 8.9.0 or later.
+It requires Node.js 10.13.0 (LTS Dubnium) or later.
 
 ## Installation
 
 ```
 npm install garage-utils
 ```
-
-**Note:** Starting in npm 5.0.0 (which ships with Node 8.0.0), installed packages are saved by
-default, so you no longer need to use the `--save` option.
 
 ## APIs
 
