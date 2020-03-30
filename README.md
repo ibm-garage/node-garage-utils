@@ -7,7 +7,7 @@
 This module provides common APIs and CLI utilities for Node.js/Express applications at the IBM
 Cloud Garage.
 
-It requires Node.js 8.0.0 or later.
+It requires Node.js 8.9.0 or later.
 
 ## Installation
 
@@ -268,53 +268,108 @@ const { errors } = require("garage-utils");
 
 Creates errors that are easily translated into HTTP responses.
 
-#### errors.error(status, message, [detail], [cause])
+Implementations of services that are exposed through a REST API can throw/reject with these errors
+to communicate that a particular HTTP response should be sent. Functions are also provided to
+facilitate handling these errors, while treating other, unrecognized errors as internal server
+errors.
 
-Creates a new `Error` instance with a status code, a message formed from the specified message and
-detail (if truthy), and a nested cause (usually another error).
+#### errors.responseError(status, message, [{ detail, code, cause }])
+
+Creates a new `Error` instance with a numeric status and a message. You can also set an additional
+detail text, an error code, and/or a cause (usually another error) via an options object.
 
 ```
-const err = errors.errror(500, "Internal server error", "Failure in underlying service", caughtErr);
-winston.error(err);
-res.status(err.status).send(err.message);
+const err = errors.responseError(500, "Internal server error", {
+  detail: "Failure in underlying service",
+  code: 1000,
+  cause: caughtErr
+});
+logger.error(err);
+res.status(err.status).send(`${err.message}: ${err.detail} [${err.code}]`);
 ```
 
-#### errors.badRequest([detail], [cause])
+For convenience, there are a number of factories for specific errors, which you'll usually use
+instead of calling `responseError()` directly. Each factory provides the correct status and a
+default message (the standard error message for that status). You can override that message and
+provide a detail, code, and/or cause via an options object.
 
-Creates a 400 Bad request error, with optional detail and cause.
+#### errors.badRequest([{ message, detail, code, cause }])
 
-#### errors.unauthorized([cause])
+Creates a 400 Bad request error, with optional message override, detail, code, and cause.
 
-Creates a 401 Unauthorized error, with optional cause.
+#### errors.unauthorized([{ message, detail, code, cause }])
 
-#### errors.forbidden([detail], [cause])
+Creates a 401 Unauthorized error, with optional message override, detail, code, and cause.
 
-Creates a 403 Forbidden error, with optional detail and cause.
+#### errors.forbidden([{ message, detail, code, cause }])
 
-#### errors.notFound([cause])
+Creates a 403 Forbidden error, with optional message override, detail, code, and cause.
 
-Creates a 404 Not found error, with optional cause.
+#### errors.notFound([{ message, detail, code, cause }])
 
-#### errors.methodNotAllowed([cause])
+Creates a 404 Not found error, with optional message override, detail, code, and cause.
 
-Creates a 405 Method not allowed error, with optional cause.
+#### errors.methodNotAllowed([{ message, detail, code, cause }])
 
-#### errors.conflict([detail], [cause])
+Creates a 405 Method not allowed error, with optional message override, detail, code, and cause.
 
-Creates a 409 Conflict error, with optional detail and cause.
+#### errors.notAcceptable([{ message, detail, code, cause }])
 
-#### errors.internalServerError([cause])
+Creates a 406 Not acceptable error, with optional message override, detail, code, and cause.
 
-Creates a 500 Internal server error, with optional cause.
+#### errors.conflict([{ message, detail, code, cause }])
 
-#### errors.responseBody(error)
+Creates a 409 Conflict error, with optional message override, detail, code, and cause.
 
-Returns an object that may be used as a JSON response body for the given error.
+#### errors.internalServerError([{ message, detail, code, cause }])
+
+Creates a 500 Internal server error, with optional message override, detail, code, and cause.
+
+#### errors.notImplemented([{ message, detail, code, cause }])
+
+Creates a 501 Not implemented error, with optional message override, detail, code, and cause.
 
 #### errors.stackWithCause(error)
 
 Returns a string combining the stack traces for the given error and up to 4 levels of nested
 causes.
+
+#### errors.toResponseError(error, [options])
+
+Takes an arbitrary error (or value) and returns a response error. This ensures that any error thrown
+by a service implementation can be used to send an HTTP response. If the error is already a response
+error (i.e. if it has a status), it is returned unchanged. Otherwise, it is wrapped in an internal
+server error (status 500), obscurring the underlying cause to prevent accidentally revealing
+information that could be used to attack the service.
+
+Non-response errors can optionally be logged. Options:
+
+- **logger**: A logger to use to log non-response errors. If not specified, nothing will be logged.
+  If you want this logging, you should usually specify the default Bunyan-based export from the
+  [Logger](#logger) API. However, any other logger implementation with level-based logging functions
+  should work.
+- **logMessage**: A message to log along with the error. This can give context, such as from which
+  service implementation the error came. There's no need to repeat the message from the error,
+  itself. This can be a string or an array (in which case all elements are passed to the logger).
+- **logLevel**: The level at which to log the error. This is "error" by default, but any other
+  [level](#levels--formats) supported by the logger can be specified.
+
+#### errors.toResponseBody(error, [options])
+
+Returns an object that may be used as a JSON response body for the given error.
+
+The error is passed through `errors.toResponseError()`, so that if it is not already a response
+error (i.e. if it does not have a status), it will be wrapped in an internal server error (status
+500). You can specify the same logging-related options supported by that function to this one.
+
+The recognized options:
+
+- **stack**: By default, stack traces are excluded from the response. Specify a truthy value to
+  include traces, including nested causes. You should never do this in production, as stack traces
+  may reveal information that can be used to attack the service.
+- **logger**: A logger to use to log non-response errors. If not specified, nothing will be logged.
+- **logMessage**: A message to log along with the error.
+- **logLevel**: The level at which to log the error ("error" by default).
 
 ### Logger
 
