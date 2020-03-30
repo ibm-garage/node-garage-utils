@@ -5,5 +5,4 @@ module.exports = {
   time: require("./lib/time"),
   errors: require("./lib/errors"),
   logger: require("./lib/logger"),
-  cf: require("./lib/cf"),
 };

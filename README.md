@@ -17,7 +17,6 @@ It requires Node.js 10.13.0 (LTS Dubnium) or later.
   - [Time](#time)
   - [Errors](#errors)
   - [Logger](#logger)
-  - [Cloud Foundry](#cloud-foundry)
 - [CLI Utilities](#cli-utilities)
   - [CF Util](#cf-util)
 - [License](#license)
@@ -536,62 +535,6 @@ A helper function that simplifies creating a custom Bunyan
   matching property is encountered, "\*\*\*\*\*" will be included, instead of the actual value.
   Note that redaction is not applied to the included or computed props themselves, but only to
   properties nested directly or indirectly under them. Default: `[]`.
-
-### Cloud Foundry
-
-```
-const { cf } = require("garage-utils");
-```
-
-Augments [cfenv](https://github.com/cloudfoundry-community/node-cfenv) to parse and interpret
-Cloud Foundry-provided environment variables, with additional functions for querying service
-credentials.
-
-> **Deprecated**: `cf` was deprecated in version 4.1.0 of garage-utils, and will be removed in a
-> future version. You should adopt the new `cloudEnv` API, which works in both Cloud Foundry and
-> Kubernetes environments, instead. If your Cloud Foundry app has specific needs that it does not
-> address, you can use [cfenv](https://github.com/cloudfoundry-community/node-cfenv) directly.
-
-#### cf.cfEnv(options)
-
-Returns the core bits of Clound Foundry data.
-
-This function is equivalent to `getAppEnv()` in cfenv, and the result has all of the properties
-detailed in the cfenv docs, plus some extras described here. The reason for the different name is
-to avoid confusion, since garage-utils already has an `appEnv`.
-
-All of the options provided by `getAppEnv()` are supported here, as well.
-
-In previous releases, this function automatically read a `services.json` file if no `VCAP_SERVICES`
-environment variable was defined, which was useful when running a server locally in your
-development environment. As of version 4.0.0 of garage-utils, that functionality has been removed.
-Instead, you should take care to initialize `VCAP_SERVICES` in the development environment. The
-`cfutil` CLI can assist with that (see the `env` command below).
-
-It is also recommended that you set the `PORT` environment variable in the development environment,
-so as to ensure that the server runs on the same port for everyone. Otherwise, this implementation
-will use [ports](https://www.npmjs.com/package/ports) to assign an arbitrary port, which can vary
-across different people's environments.
-
-The object returned by `cfEnv()` is augmented with two additional functions:
-
-##### cfEnv.getServiceCredsByLabel(labelSpec, required)
-
-Returns the credentials object of a service by label (i.e. by the name of the service, not the name
-of the service instance). The labelSpec can be either a regular expression or a string (in which
-case it must match exactly). If there are multiple instances of the matched service, this function
-throws an error, and you should use `getServiceCredsByName()`, instead. Note, however, that if the
-labelSpec is a regular expression that matches more than one service label, the instance of the
-first service will be returned.
-
-If no service is found with the specified spec, this function returns null by default, or throws
-an error if required is true.
-
-##### cfEnv.getServiceCredsByName(nameSpec, required)
-
-Returns the credentials object of a service by name (i.e. by instance name). This works just like
-`cfEnv.getServiceCreds()` if required is false. If it is true, this function throws an error if no
-service is found.
 
 ## CLI Utilities
 
