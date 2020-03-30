@@ -1,6 +1,6 @@
 {
   "name": "garage-utils",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "description": "Common utilities for Node/Express applications at the IBM Cloud Garage.",
   "repository": {
     "type": "git",

@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.3.0...v5.0.0) (2020-03-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* The cf API, which was deprecated in version 4.1.0, has now been removed entirely. Clients should adopt the new cloudEnv API, which works in both Cloud Foundry and Kubernetes environments, or use the cfenv package directly.
+* The minimum supported version of Node.js is now 10.13.0 (LTS Dubnium).
+* **errors:** the errors API is completely changed. All clients using it must be updated accordingly.
+  - errors.error() is replaced by errors.responseError(), which no longer takes detail and cause separately as arguments, but together in an options argument.
+  - All the error factory functions (badRequest(), unauthorized(), etc.) now take a single, standard options argument, instead of varying arguments per function.
+  - responseBody() is replaced by toResponseBody(), which has a new options argument.
+
+### Features
+
+* **errors:** introduce a more flexible API to support deatils, codes, and causes on all errors ([2465aa2](https://github.com/ibm-garage/node-garage-utils/commit/2465aa229569357b1ea7289547860cc8382974b7))
+
+
+* remove cf API ([b473b63](https://github.com/ibm-garage/node-garage-utils/commit/b473b63162b245a9f57221e0d8e22e6c9e20698c))
+* update dependencies, require Node 10.13.0, and reformat code with Prettier ([5a8f5fb](https://github.com/ibm-garage/node-garage-utils/commit/5a8f5fb8a010e9f65cb5f83f0fcd23cdbcce64fb))
+
 ## [4.3.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.2.0...v4.3.0) (2020-03-24)
 
 
