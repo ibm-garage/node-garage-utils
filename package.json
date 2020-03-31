@@ -44,5 +44,38 @@
     "jest": "^25.2.4",
     "prettier": "^2.0.2",
     "standard-version": "^7.1.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true,
+      "es6": true,
+      "jest": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": [
+        "error",
+        {
+          "vars": "all",
+          "args": "none"
+        }
+      ],
+      "global-require": "error",
+      "no-new-require": "error",
+      "no-path-concat": "error",
+      "no-var": "error",
+      "no-process-exit": "off"
+    }
+  },
+  "prettier": {
+    "printWidth": 100
   }
 }
