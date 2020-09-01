@@ -30,20 +30,20 @@
     "cfutil": "bin/cfutil.js"
   },
   "dependencies": {
-    "bunyan": "^1.8.12",
+    "bunyan": "^1.8.14",
     "bunyan-prettystream-circularsafe": "^0.3.1",
-    "commander": "^5.0.0",
+    "commander": "^6.1.0",
     "eol": "^0.9.1",
-    "moment": "^2.24.0"
+    "moment": "^2.27.0"
   },
   "devDependencies": {
-    "coveralls": "^3.0.11",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.5.0",
-    "eslint-plugin-prettier": "^3.1.2",
-    "jest": "^25.2.4",
-    "prettier": "^2.0.2",
-    "standard-version": "^7.1.0"
+    "coveralls": "^3.1.0",
+    "eslint": "^7.8.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^25.5.4",
+    "prettier": "^2.1.1",
+    "standard-version": "^9.0.0"
   },
   "eslintConfig": {
     "root": true,
