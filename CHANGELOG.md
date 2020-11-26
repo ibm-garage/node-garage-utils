@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.2](https://github.com/ibm-garage/node-garage-utils/compare/v5.0.1...v5.0.2) (2020-11-26)
+
+
+### Bug Fixes
+
+* **appEnv:** recognize the new Mocha script name (mocha) as test environment ([42832ba](https://github.com/ibm-garage/node-garage-utils/commit/42832baadccdb19bc21f6e675f71292a378e5239))
+
 ### [5.0.1](https://github.com/ibm-garage/node-garage-utils/compare/v5.0.0...v5.0.1) (2020-09-01)
 
 ## [5.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v4.3.0...v5.0.0) (2020-03-30)
