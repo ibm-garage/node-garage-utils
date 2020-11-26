@@ -1,4 +1,4 @@
-[![Build status](https://img.shields.io/travis/ibm-garage/node-garage-utils/master.svg)](https://travis-ci.org/ibm-garage/node-garage-utils)
+[![Build status](https://img.shields.io/github/workflow/status/ibm-garage/node-garage-utils/Build)](https://github.com/ibm-garage/node-garage-utils/actions?query=workflow%3ABuild)
 [![Coverage status](https://img.shields.io/coveralls/ibm-garage/node-garage-utils.svg)](https://coveralls.io/github/ibm-garage/node-garage-utils?branch=master)
 [![Code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
