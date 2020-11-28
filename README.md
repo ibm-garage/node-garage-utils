@@ -282,10 +282,16 @@ to communicate that a particular HTTP response should be sent. Functions are als
 facilitate handling these errors, while treating other, unrecognized errors as internal server
 errors.
 
+#### errors.ResponseError(status, message, [{ detail, code, cause }])
+
+Constructor for a response error, which has a numeric status and a message. You can also set an
+additional detail text, an error code, and/or a cause (usually another error) via an options
+object.
+
 #### errors.responseError(status, message, [{ detail, code, cause }])
 
-Creates a new `Error` instance with a numeric status and a message. You can also set an additional
-detail text, an error code, and/or a cause (usually another error) via an options object.
+Creates a new `ResponseError` instance with a numeric status and a message and, optionally, an
+additional detail text, an error code, and/or a cause (usually another error).
 
 ```
 const err = errors.responseError(500, "Internal server error", {
@@ -346,10 +352,10 @@ causes.
 #### errors.toResponseError(error, [options])
 
 Takes an arbitrary error (or value) and returns a response error. This ensures that any error thrown
-by a service implementation can be used to send an HTTP response. If the error is already a response
-error (i.e. if it has a status), it is returned unchanged. Otherwise, it is wrapped in an internal
-server error (status 500), obscurring the underlying cause to prevent accidentally revealing
-information that could be used to attack the service.
+by a service implementation can be used to send an HTTP response. If the error is already a
+`ResponseError`, it is returned unchanged. Otherwise, it is wrapped in an internal server error
+(status 500), obscurring the underlying cause to prevent accidentally revealing information that
+could be used to attack the service.
 
 Non-response errors can optionally be logged. Options:
 
