@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.0.2...v5.1.0) (2020-11-28)
+
+
+### Features
+
+* **errors:** expose a custom ResponseError class and do an instanceof check in toResponseError() ([0300377](https://github.com/ibm-garage/node-garage-utils/commit/030037784e79e204fc6e6bc82fc0127b0103b6db))
+
 ### [5.0.2](https://github.com/ibm-garage/node-garage-utils/compare/v5.0.1...v5.0.2) (2020-11-26)
 
 
