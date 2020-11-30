@@ -357,7 +357,8 @@ by a service implementation can be used to send an HTTP response. If the error i
 (status 500), obscurring the underlying cause to prevent accidentally revealing information that
 could be used to attack the service.
 
-Non-response errors can optionally be logged. Options:
+When a non-response error is wrapped in an internal server error, it can optionally be logged, as
+well. Options:
 
 - **logger**: A logger to use to log non-response errors. If not specified, nothing will be logged.
   If you want this logging, you should usually specify the default Bunyan-based export from the
