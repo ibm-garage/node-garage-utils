@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.1.0...v5.2.0) (2020-11-30)
+
+
+### Features
+
+* **errors:** log the internal server error created in toResponseError(), instead of the underlying cause, to show where it was handled on the stack ([bf2db57](https://github.com/ibm-garage/node-garage-utils/commit/bf2db5701a43cefa1371af35bf707432d7afe847))
+
 ## [5.1.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.0.2...v5.1.0) (2020-11-28)
 
 
