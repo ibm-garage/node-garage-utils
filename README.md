@@ -222,6 +222,12 @@ const { time } = require("garage-utils");
 
 Higher-level time handling functions based on [Moment.js](https://momentjs.com/).
 
+> **Deprecated**: `time` was deprecated in version 5.3.0 of garage-utils, and will be removed in a future version.
+> This API was not widely used.
+> Also, Moment.js is an older library, with several good alternatives, and so forcing a dependency on it no longer seems justified.
+>
+> To prepare for the removal of the `time` API, you should declare the dependency on Moment.js directly in any application that uses it and, if required, pull the `time` code into the application.
+
 #### time.parseUnixTime(millis)
 
 Creates a moment from the given UNIX time (milliseconds since the Epoch).
