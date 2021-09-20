@@ -22,19 +22,19 @@ jobs:
         run: npm run lint
       - name: Run unit tests
         run: npm run test:coverage
-      - name: Post to Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          flag-name: Node.js ${{ matrix.node-version }}
-          parallel: true
-  finish:
-    name: Finish
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Finish Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true
+  #     - name: Post to Coveralls
+  #       uses: coverallsapp/github-action@master
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         flag-name: Node.js ${{ matrix.node-version }}
+  #         parallel: true
+  # finish:
+  #   name: Finish
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Finish Coveralls
+  #       uses: coverallsapp/github-action@master
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         parallel-finished: true
