@@ -4,7 +4,7 @@
 
 # Garage Utilities for Node
 
-This module provides common APIs and CLI utilities for Node.js/Express applications at the IBM Garage.
+This package provides common APIs and CLI utilities for Node.js/Express applications at the IBM Garage.
 
 It requires Node.js 12.13.0 (LTS Erbium) or later.
 
@@ -14,9 +14,9 @@ It requires Node.js 12.13.0 (LTS Erbium) or later.
 - [APIs](#apis)
   - [Application Environment](#application-environment)
   - [Cloud Environment](#cloud-environment)
-  - [Time](#time)
   - [Errors](#errors)
   - [Logger](#logger)
+- [Removed APIs](#removed-apis)
 - [CLI Utilities](#cli-utilities)
   - [CF Util](#cf-util)
 - [License](#license)
@@ -69,7 +69,7 @@ If `NODE_ENV` is not set (or is set to an empty value), then `appEnv.env` is usu
 
 1.  "test" when running under Mocha (i.e. when `appEnv.mainFile`'s last segment is `_mocha`).
 
-1.  "script" when running as a script or binary (i.e. when the path of `appEnv.mainFile` is `scripts` or `bin`, under the application root directory or within the garage-utils module).
+1.  "script" when running as a script or binary (i.e. when the path of `appEnv.mainFile` is `scripts` or `bin`, under the application root directory or within the garage-utils package).
 
 [Jest](https://jestjs.io/en/) automatically sets `NODE_ENV` to "test", and the special handling for [Mocha](https://mochajs.org/) attempts to give a similar experience in that testing environment.
 This is used by the `logger` API in garage-utils to automatically configure itself for testing in a Mocha environment.
@@ -213,45 +213,6 @@ If more than one spec is satisfied, an error will be thrown instead.
 This is to help prevent accidentally sending credentials to the wrong service in an ambiguously configured environment.
 
 If no service is found that satisfies the given spec (or specs), this function returns undefined by default, or throws an error if `required` is true.
-
-### Time
-
-```
-const { time } = require("garage-utils");
-```
-
-Higher-level time handling functions based on [Moment.js](https://momentjs.com/).
-
-> **Deprecated**: `time` was deprecated in version 5.3.0 of garage-utils, and will be removed in a future version.
-> This API was not widely used.
-> Also, Moment.js is an older library, with several good alternatives, and so forcing a dependency on it no longer seems justified.
->
-> To prepare for the removal of the `time` API, you should declare the dependency on Moment.js directly in any application that uses it and, if required, pull the `time` code into the application.
-
-#### time.parseUnixTime(millis)
-
-Creates a moment from the given UNIX time (milliseconds since the Epoch).
-If the UNIX time is not an integer, it will be converted if possible.
-Returns a UTC moment, or undefined for invalid input.
-
-#### time.parseIso(isoDateTime)
-
-Strictly parses an ISO 8601 date-time string that must specify a UTC offset (or Z).
-Returns a moment, or undefined if the date is invalid or doesn't have a UTC offset.
-The moment has the UTC offset specified in the string by default.
-You can use `utc()` or `local()` to shift to UTC or local time.
-
-#### time.isIsoUtc(dateTime)
-
-Returns true for an ISO 8601 date-time string with a zero UTC offset, false otherwise.
-
-#### time.formatIsoUtc(m)
-
-Converts a moment to an ISO 8601 date-time string with a 0 UTC offset (Z).
-
-#### time.nowIsoUtc()
-
-Returns the current time as an ISO 8601 date-time string with a 0 UTC offset (Z).
 
 ### Errors
 
@@ -506,6 +467,15 @@ The recognized options:
   Note that redaction is not applied to the included or computed props themselves, but only to properties nested directly or indirectly under them.
   Default: `[]`.
 
+## Removed APIs
+
+The garage-utils package previously included the following APIs, which have since been removed.
+
+| API  | Removed in | Guidance                                                                                                                                                      |
+| ---- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| cf   | 5.0.0      | Adopt the newer [cloudEnv](#cloud-environment) API or use the [cfenv](https://www.npmjs.com/package/cfenv) package directly.                                  |
+| time | 6.0.0      | Declare a dependency directly on [Moment.js](https://www.npmjs.com/package/moment). If required, you can copy code from the removed `time.js` implementation. |
+
 ## CLI Utilities
 
 CLI utilities are published through the garage-utils npm package, so they can be invoked directly from an npm run script, or from the command line if the package is installed globally.
@@ -564,5 +534,5 @@ Use the `-h` option to see all options supported by the `logs` command.
 
 ## License
 
-This module is licensed under the MIT License.
+This package is licensed under the MIT License.
 The full text is available in [LICENSE](LICENSE).
