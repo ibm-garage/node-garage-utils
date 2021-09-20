@@ -6,7 +6,7 @@
 
 This module provides common APIs and CLI utilities for Node.js/Express applications at the IBM Garage.
 
-It requires Node.js 10.13.0 (LTS Dubnium) or later.
+It requires Node.js 12.13.0 (LTS Erbium) or later.
 
 ## Contents
 

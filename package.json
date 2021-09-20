@@ -18,7 +18,7 @@
     "release": "standard-version"
   },
   "engines": {
-    "node": ">=10.13.0"
+    "node": ">=12.13.0"
   },
   "files": [
     "index.js",
@@ -47,11 +47,11 @@
     "root": true,
     "env": {
       "node": true,
-      "es6": true,
+      "es2017": true,
       "jest": true
     },
     "parserOptions": {
-      "ecmaVersion": 2018
+      "ecmaVersion": 2019
     },
     "extends": [
       "eslint:recommended",
