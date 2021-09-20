@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.2.0...v5.3.0) (2021-09-20)
+
+
+### Features
+
+* **time:** deprecate the time API ([f1c0a58](https://github.com/ibm-garage/node-garage-utils/commit/f1c0a589bcab483ccbc1f65e58bbf3e0060da7b8))
+
 ## [5.2.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.1.0...v5.2.0) (2020-11-30)
 
 
