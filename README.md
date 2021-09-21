@@ -2,9 +2,9 @@
 [![Coverage status](https://img.shields.io/coveralls/ibm-garage/node-garage-utils.svg)](https://coveralls.io/github/ibm-garage/node-garage-utils?branch=master)
 [![Code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-# Garage Utilities for Node
+# Garage Utilities for Node.js
 
-This package provides common APIs and CLI utilities for Node.js/Express applications at the IBM Garage.
+This package provides common utilities for Node.js/Express applications at the IBM Garage for Cloud.
 
 It requires Node.js 12.13.0 (LTS Erbium) or later.
 
@@ -17,8 +17,6 @@ It requires Node.js 12.13.0 (LTS Erbium) or later.
   - [Errors](#errors)
   - [Logger](#logger)
 - [Removed APIs](#removed-apis)
-- [CLI Utilities](#cli-utilities)
-  - [CF Util](#cf-util)
 - [License](#license)
 
 ## Installation
@@ -475,62 +473,6 @@ The garage-utils package previously included the following APIs, which have sinc
 | ---- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | cf   | 5.0.0      | Adopt the newer [cloudEnv](#cloud-environment) API or use the [cfenv](https://www.npmjs.com/package/cfenv) package directly.                                  |
 | time | 6.0.0      | Declare a dependency directly on [Moment.js](https://www.npmjs.com/package/moment). If required, you can copy code from the removed `time.js` implementation. |
-
-## CLI Utilities
-
-CLI utilities are published through the garage-utils npm package, so they can be invoked directly from an npm run script, or from the command line if the package is installed globally.
-Usually, you will use `npx` to run them from a project with a dependency on garage-utils.
-
-### CF Util
-
-```
-$ npx cfutil -h
-$ npx cfutil env -h
-$ npx cfutil logs -h
-```
-
-#### env
-
-Saves information about the enviroment of a Cloud Foundry app to a file that can be used to replicate (or partially replicate) that environment when running locally.
-
-```
-$ npx cfutil env my-app
-```
-
-By default, a `.env` file is created, defining just the `VCAP_SERVICES` environment variable read from the specified app.
-You can also opt to include user-provided environment variables with the `-u` option.
-You can source this file before running locally to set up the environment.
-This is also the same file format consumed by [dotenv](https://www.npmjs.com/package/dotenv), though its use is not recommended because it adds complexity and runtime dependencies.
-
-Alternatively, with the `-j` option, a `services.json` file can be created, containing just the formatted JSON content of `VCAP_SERVICES`.
-The advantage of this approach is that the file is easier to read and edit.
-The disadvantage is that multiple environment variables cannot be defined.
-
-Whether you opt for a `.env` or `services.json` file, you can also use the `-s` option to generate a tiny `env.sh` script that will consume it at run time.
-For example, you might define an npm run script like this:
-
-```
-"start:local": ". env.sh && node server/server.js",
-```
-
-Here, sourcing `env.sh` adds the variables defined in `.env` or `services.json` to the environment.
-
-Use the `-h` option to see all options supported by the `env` command.
-
-#### logs
-
-Tails or shows recent logs for a Cloud Foundry app, trimming the content added by Loggregator from JSON messages to allow for formatting by the Bunyan CLI.
-This command takes the place of `cf logs` when you are using the Bunyan-based `logger` API.
-
-```
-$ npx cfutil logs my-app | npx bunyan
-```
-
-By default, Loggregator content is removed from JSON messages.
-All other messages pass through unchanged (except for the trimming of leading whitespace), and then pass through Bunyan as well.
-Non-application and non-JSON messages can be excluded completely with the `-a` and `-j` options, respectively.
-
-Use the `-h` option to see all options supported by the `logs` command.
 
 ## License
 

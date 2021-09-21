@@ -1,7 +1,7 @@
 {
   "name": "garage-utils",
   "version": "5.3.0",
-  "description": "Common utilities for Node/Express applications at the IBM Cloud Garage.",
+  "description": "Common utilities for Node.js/Express applications at the IBM Garage for Cloud.",
   "repository": {
     "type": "git",
     "url": "https://github.com/ibm-garage/node-garage-utils.git"
@@ -13,7 +13,7 @@
     "test": "jest --verbose",
     "test:watch": "jest --watchAll",
     "test:coverage": "jest --verbose --coverage",
-    "lint": "eslint index.js lib bin",
+    "lint": "eslint index.js lib",
     "format": "prettier --write '**/*.@(js|json)'",
     "release": "standard-version"
   },
@@ -22,17 +22,11 @@
   },
   "files": [
     "index.js",
-    "lib/",
-    "bin/"
+    "lib/"
   ],
-  "bin": {
-    "cfutil": "bin/cfutil.js"
-  },
   "dependencies": {
     "bunyan": "^1.8.15",
-    "bunyan-prettystream-circularsafe": "^0.3.1",
-    "commander": "^8.2.0",
-    "eol": "^0.9.1"
+    "bunyan-prettystream-circularsafe": "^0.3.1"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
