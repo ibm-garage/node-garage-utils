@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.3.0...v6.0.0) (2021-09-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cfutil:** The cfutil CLI has been removed from this package. The code has been preserved in https://github.com/ibm-garage/node-garage-tools, with the intent that it could be published as a separate package if there is a need for it.
+* **time:** The time API, which was deprecated in version 5.3.0, has now been removed entirely. Clients can declare a dependency directly on Moment.js. If required, they can also copy code from the removed time.js implementation.
+* **errors:** Minor change to ResponseError: detail, code, and cause properties are always present, even if null or undefined.
+* The minimum supported version of Node.js is now 12.13.0 (LTS Erbium).
+
+### Features
+
+* **cfutil:** remove cfutil CLI ([344ce9b](https://github.com/ibm-garage/node-garage-utils/commit/344ce9bf11a5ae1b849ee5fd559a22b5a4c8d4ec))
+* **time:** remove time API ([3361bbb](https://github.com/ibm-garage/node-garage-utils/commit/3361bbb6eec8fae44e91cff16a6b9b820c6944b1))
+
+
+### Bug Fixes
+
+* **errors:** always include detail, code, cause properties on ResponseError, to align with Error.cause on Node 16 ([b1a6cb6](https://github.com/ibm-garage/node-garage-utils/commit/b1a6cb67e6b106805ea28680a28ad93750991813))
+
+
+* require Node.js 12.13.0, as 10.x is out of LTS support ([ce7fc6c](https://github.com/ibm-garage/node-garage-utils/commit/ce7fc6c4d1e587a508ef6aa94d7fe80ab103444a))
+
 ## [5.3.0](https://github.com/ibm-garage/node-garage-utils/compare/v5.2.0...v5.3.0) (2021-09-20)
 
 
